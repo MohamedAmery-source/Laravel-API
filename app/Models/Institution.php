@@ -1,0 +1,24 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Institution extends Model
+{
+    use HasFactory;
+
+    protected $primaryKey = 'institution_id'; // لأننا لم نستخدم id الافتراضي
+
+    protected $fillable = [
+        'user_id',
+        'name',
+        'address',
+        'description',
+        'website',
+        'contact_person',
+        'contact_phone',
+        'is_active'
+    ];
+}
