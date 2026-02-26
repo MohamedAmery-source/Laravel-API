@@ -12,6 +12,7 @@ Route::post('/login', [AuthController::class, 'login']);
 // مسارات محمية (تتطلب توكن) - سننقل مسار إضافة الفرص هنا لاحقاً
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/change-password', [AuthController::class, 'changePassword']);
     
     // هنا سنضع المسارات التي تحتاج حماية مستقبلاً
 });
