@@ -3,42 +3,71 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreOpportunityRequest;
+use App\Http\Requests\UpdateOpportunityRequest;
+use App\Http\Resources\OpportunityResource;
+use App\Models\TrainingOpportunity;
 use Illuminate\Http\Request;
-use App\Models\TrainingOpportunity; 
-use App\Http\Requests\StoreOpportunityRequest; // ضروري جداً لاستقبال ملف التحقق
 
 class OpportunityController extends Controller
 {
-    /**
-     * جلب جميع الفرص التدريبية الفعالة
-     */
-    public function index()
+    public function index(Request $request)
     {
-        $opportunities = TrainingOpportunity::where('is_active', true)->get();
+        $query = TrainingOpportunity::query()->where('is_active', true);
+
+        if ($request->filled('institution_id')) {
+            $query->where('institution_id', $request->institution_id);
+        }
+
+        $opportunities = $query->get();
 
         return response()->json([
             'success' => true,
-            'message' => 'تم جلب فرص التدريب الحقيقية بنجاح',
-            'data' => $opportunities
-        ], 200, [], JSON_UNESCAPED_UNICODE); 
+            'data' => OpportunityResource::collection($opportunities),
+        ], 200);
     }
 
-    /**
-     * إضافة فرصة تدريبية جديدة
-     */
     public function store(StoreOpportunityRequest $request)
     {
-        // 1. استلام البيانات التي تم التحقق منها تلقائياً عبر StoreOpportunityRequest
-        $validatedData = $request->validated();
+        $opportunity = TrainingOpportunity::create($request->validated());
 
-        // 2. إنشاء الفرصة في قاعدة البيانات
-        $opportunity = TrainingOpportunity::create($validatedData);
-
-        // 3. إرجاع رد نجاح
         return response()->json([
             'success' => true,
-            'message' => 'تم إضافة الفرصة التدريبية بنجاح!',
-            'data' => $opportunity
-        ], 201, [], JSON_UNESCAPED_UNICODE);
+            'message' => 'تم إضافة الفرصة التدريبية بنجاح',
+            'data' => new OpportunityResource($opportunity),
+        ], 201);
+    }
+
+    public function show(string $id)
+    {
+        $opportunity = TrainingOpportunity::findOrFail($id);
+
+        return response()->json([
+            'success' => true,
+            'data' => new OpportunityResource($opportunity),
+        ], 200);
+    }
+
+    public function update(UpdateOpportunityRequest $request, string $id)
+    {
+        $opportunity = TrainingOpportunity::findOrFail($id);
+        $opportunity->update($request->validated());
+
+        return response()->json([
+            'success' => true,
+            'message' => 'تم تحديث الفرصة التدريبية بنجاح',
+            'data' => new OpportunityResource($opportunity),
+        ], 200);
+    }
+
+    public function destroy(string $id)
+    {
+        $opportunity = TrainingOpportunity::findOrFail($id);
+        $opportunity->update(['is_active' => false]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'تم إخفاء الفرصة التدريبية بنجاح',
+        ], 200);
     }
 }

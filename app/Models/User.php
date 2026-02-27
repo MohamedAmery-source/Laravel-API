@@ -54,4 +54,41 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function student()
+    {
+        return $this->hasOne(Student::class, 'user_id', 'user_id');
+    }
+
+    public function institution()
+    {
+        return $this->hasOne(Institution::class, 'user_id', 'user_id');
+    }
+
+    public function documents()
+    {
+        return $this->hasMany(Document::class, 'user_id', 'user_id');
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class, 'user_id', 'user_id');
+    }
+
+    public function complaints()
+    {
+        return $this->hasMany(Complaint::class, 'user_id', 'user_id');
+    }
+
+    public function userRoles()
+    {
+        return $this->hasMany(UserRole::class, 'user_id', 'user_id');
+    }
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class, 'user_roles', 'user_id', 'role_id')
+            ->withPivot(['is_active', 'created_by', 'updated_by', 'assigned_at'])
+            ->withTimestamps();
+    }
 }

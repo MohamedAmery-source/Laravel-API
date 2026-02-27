@@ -35,4 +35,9 @@ class TrainingOpportunity extends Model
     {
         return $this->belongsTo(Institution::class, 'institution_id', 'institution_id');
     }
+
+    public function trainingRequests()
+    {
+        return $this->hasMany(TrainingRequest::class, 'opportunity_id', 'opportunity_id');
+    }
 }

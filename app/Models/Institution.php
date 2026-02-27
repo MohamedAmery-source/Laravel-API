@@ -21,4 +21,14 @@ class Institution extends Model
         'contact_phone',
         'is_active'
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'user_id');
+    }
+
+    public function trainingOpportunities()
+    {
+        return $this->hasMany(TrainingOpportunity::class, 'institution_id', 'institution_id');
+    }
 }

@@ -24,4 +24,11 @@ class Permission extends Model
     {
         return $this->hasMany(RolePermission::class, 'permission_id', 'permission_id');
     }
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class, 'role_permissions', 'permission_id', 'role_id')
+            ->withPivot(['granted', 'is_active', 'created_by', 'updated_by'])
+            ->withTimestamps();
+    }
 }
