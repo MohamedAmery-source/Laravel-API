@@ -13,10 +13,7 @@ class EvaluationController extends Controller
     {
         $evaluations = Evaluation::query()->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => EvaluationResource::collection($evaluations),
-        ], 200);
+        return $this->success(EvaluationResource::collection($evaluations), null, 200);
     }
 
     public function store(StoreEvaluationRequest $request)
@@ -26,10 +23,6 @@ class EvaluationController extends Controller
 
         $evaluation = Evaluation::create($data);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'تم حفظ التقييم بنجاح',
-            'data' => new EvaluationResource($evaluation),
-        ], 201);
+        return $this->success(new EvaluationResource($evaluation), 'تم حفظ التقييم بنجاح', 201);
     }
 }

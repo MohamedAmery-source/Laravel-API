@@ -13,10 +13,7 @@ class ComplaintController extends Controller
     {
         $complaints = Complaint::query()->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => ComplaintResource::collection($complaints),
-        ], 200);
+        return $this->success(ComplaintResource::collection($complaints), null, 200);
     }
 
     public function store(StoreComplaintRequest $request)
@@ -29,20 +26,13 @@ class ComplaintController extends Controller
             'resolved_at' => $request->resolved_at,
         ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'تم إرسال الشكوى بنجاح',
-            'data' => new ComplaintResource($complaint),
-        ], 201);
+        return $this->success(new ComplaintResource($complaint), 'تم إرسال الشكوى بنجاح', 201);
     }
 
     public function show(string $id)
     {
         $complaint = Complaint::findOrFail($id);
 
-        return response()->json([
-            'success' => true,
-            'data' => new ComplaintResource($complaint),
-        ], 200);
+        return $this->success(new ComplaintResource($complaint), null, 200);
     }
 }

@@ -45,14 +45,10 @@ class AuthController extends Controller
             $token = $user->createToken('auth_token')->plainTextToken;
             $user->load(['student', 'institution']);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'تم إنشاء الحساب بنجاح',
-                'data' => [
-                    'user' => new UserResource($user),
-                    'token' => $token
-                ]
-            ], 201);
+            return $this->success([
+                'user' => new UserResource($user),
+                'token' => $token
+            ], 'تم إنشاء الحساب بنجاح', 201);
         });
     }
 
@@ -63,42 +59,48 @@ class AuthController extends Controller
         $user = User::where('email', $fields['email'])->first();
 
         if (!$user || !Hash::check($fields['password'], $user->password)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'بيانات الدخول غير صحيحة'
-            ], 401);
+            return $this->error('بيانات الدخول غير صحيحة', 401);
         }
 
         $token = $user->createToken('auth_token')->plainTextToken;
         $user->load(['student', 'institution']);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'تم تسجيل الدخول بنجاح',
-            'data' => [
-                'user' => new UserResource($user),
-                'token' => $token
-            ]
-        ], 200);
+        return $this->success([
+            'user' => new UserResource($user),
+            'token' => $token
+        ], 'تم تسجيل الدخول بنجاح', 200);
     }
 
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'تم تسجيل الخروج بنجاح'
+        return $this->success(null, 'تم تسجيل الخروج بنجاح');
+    }
+
+    public function changePassword(Request $request)
+    {
+        $fields = $request->validate([
+            'current_password' => 'required|string',
+            'new_password' => 'required|string|confirmed|min:8',
         ]);
+
+        $user = $request->user();
+
+        if (!$user || !Hash::check($fields['current_password'], $user->password)) {
+            return $this->error('كلمة المرور الحالية غير صحيحة', 422);
+        }
+
+        $user->password = Hash::make($fields['new_password']);
+        $user->save();
+
+        return $this->success(null, 'تم تحديث كلمة المرور بنجاح', 200);
     }
 
     public function profile(Request $request)
     {
         $user = $request->user()->load(['student', 'institution']);
 
-        return response()->json([
-            'success' => true,
-            'data' => new UserResource($user),
-        ], 200);
+        return $this->success(new UserResource($user), null, 200);
     }
 }

@@ -15,9 +15,6 @@ class NotificationController extends Controller
             ->orderByDesc('created_at')
             ->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => NotificationResource::collection($notifications),
-        ], 200);
+        return $this->success(NotificationResource::collection($notifications), null, 200);
     }
 }

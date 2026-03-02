@@ -14,26 +14,17 @@ class LookupController extends Controller
         $type = $request->query('type');
 
         if (!$type) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Type query parameter is required',
-            ], 422);
+            return $this->error('Type query parameter is required', 422);
         }
 
         $master = LookupMaster::where('lookup_code', $type)->first();
 
         if (!$master) {
-            return response()->json([
-                'success' => true,
-                'data' => [],
-            ], 200);
+            return $this->success([], null, 200);
         }
 
         $values = LookupValue::where('lookup_id', $master->lookup_id)->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => $values,
-        ], 200);
+        return $this->success($values, null, 200);
     }
 }

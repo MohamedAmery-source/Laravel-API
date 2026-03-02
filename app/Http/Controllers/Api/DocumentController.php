@@ -24,10 +24,6 @@ class DocumentController extends Controller
             'is_active' => true,
         ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'تم رفع الملف بنجاح',
-            'data' => new DocumentResource($document),
-        ], 201);
+        return $this->success(new DocumentResource($document), 'تم رفع الملف بنجاح', 201);
     }
 }

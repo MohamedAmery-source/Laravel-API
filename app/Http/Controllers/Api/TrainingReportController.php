@@ -20,10 +20,7 @@ class TrainingReportController extends Controller
 
         $reports = $query->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => TrainingReportResource::collection($reports),
-        ], 200);
+        return $this->success(TrainingReportResource::collection($reports), null, 200);
     }
 
     public function store(StoreReportRequest $request)
@@ -33,10 +30,6 @@ class TrainingReportController extends Controller
 
         $report = TrainingReport::create($data);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'تم رفع التقرير بنجاح',
-            'data' => new TrainingReportResource($report),
-        ], 201);
+        return $this->success(new TrainingReportResource($report), 'تم رفع التقرير بنجاح', 201);
     }
 }

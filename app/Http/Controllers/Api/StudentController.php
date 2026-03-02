@@ -15,31 +15,21 @@ class StudentController extends Controller
     {
         $students = Student::query()->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => StudentResource::collection($students),
-        ], 200);
+        return $this->success(StudentResource::collection($students), null, 200);
     }
 
     public function store(StoreStudentRequest $request)
     {
         $student = Student::create($request->validated());
 
-        return response()->json([
-            'success' => true,
-            'message' => 'تم إنشاء ملف الطالب بنجاح',
-            'data' => new StudentResource($student),
-        ], 201);
+        return $this->success(new StudentResource($student), 'تم إنشاء ملف الطالب بنجاح', 201);
     }
 
     public function show(string $id)
     {
         $student = Student::findOrFail($id);
 
-        return response()->json([
-            'success' => true,
-            'data' => new StudentResource($student),
-        ], 200);
+        return $this->success(new StudentResource($student), null, 200);
     }
 
     public function update(UpdateStudentRequest $request, string $id)
@@ -47,11 +37,7 @@ class StudentController extends Controller
         $student = Student::findOrFail($id);
         $student->update($request->validated());
 
-        return response()->json([
-            'success' => true,
-            'message' => 'تم تحديث بيانات الطالب بنجاح',
-            'data' => new StudentResource($student),
-        ], 200);
+        return $this->success(new StudentResource($student), 'تم تحديث بيانات الطالب بنجاح', 200);
     }
 
     public function destroy(string $id)
@@ -59,9 +45,6 @@ class StudentController extends Controller
         $student = Student::findOrFail($id);
         $student->update(['is_active' => false]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'تم تعطيل حساب الطالب بنجاح',
-        ], 200);
+        return $this->success(null, 'تم تعطيل حساب الطالب بنجاح', 200);
     }
 }

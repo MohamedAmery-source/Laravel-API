@@ -23,9 +23,6 @@ class InternshipController extends Controller
 
         $internships = $query->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => InternshipResource::collection($internships),
-        ], 200);
+        return $this->success(InternshipResource::collection($internships), null, 200);
     }
 }

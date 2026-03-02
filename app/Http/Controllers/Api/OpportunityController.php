@@ -21,31 +21,21 @@ class OpportunityController extends Controller
 
         $opportunities = $query->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => OpportunityResource::collection($opportunities),
-        ], 200);
+        return $this->success(OpportunityResource::collection($opportunities), null, 200);
     }
 
     public function store(StoreOpportunityRequest $request)
     {
         $opportunity = TrainingOpportunity::create($request->validated());
 
-        return response()->json([
-            'success' => true,
-            'message' => 'تم إضافة الفرصة التدريبية بنجاح',
-            'data' => new OpportunityResource($opportunity),
-        ], 201);
+        return $this->success(new OpportunityResource($opportunity), 'تم إضافة الفرصة التدريبية بنجاح', 201);
     }
 
     public function show(string $id)
     {
         $opportunity = TrainingOpportunity::findOrFail($id);
 
-        return response()->json([
-            'success' => true,
-            'data' => new OpportunityResource($opportunity),
-        ], 200);
+        return $this->success(new OpportunityResource($opportunity), null, 200);
     }
 
     public function update(UpdateOpportunityRequest $request, string $id)
@@ -53,11 +43,7 @@ class OpportunityController extends Controller
         $opportunity = TrainingOpportunity::findOrFail($id);
         $opportunity->update($request->validated());
 
-        return response()->json([
-            'success' => true,
-            'message' => 'تم تحديث الفرصة التدريبية بنجاح',
-            'data' => new OpportunityResource($opportunity),
-        ], 200);
+        return $this->success(new OpportunityResource($opportunity), 'تم تحديث الفرصة التدريبية بنجاح', 200);
     }
 
     public function destroy(string $id)
@@ -65,9 +51,6 @@ class OpportunityController extends Controller
         $opportunity = TrainingOpportunity::findOrFail($id);
         $opportunity->update(['is_active' => false]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'تم إخفاء الفرصة التدريبية بنجاح',
-        ], 200);
+        return $this->success(null, 'تم إخفاء الفرصة التدريبية بنجاح', 200);
     }
 }

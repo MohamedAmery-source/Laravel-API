@@ -32,10 +32,7 @@ class TrainingRequestController extends Controller
 
         $requests = $query->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => TrainingRequestResource::collection($requests),
-        ], 200);
+        return $this->success(TrainingRequestResource::collection($requests), null, 200);
     }
 
     public function store(StoreTrainingRequest $request)
@@ -45,11 +42,7 @@ class TrainingRequestController extends Controller
 
         $trainingRequest = TrainingRequest::create($data);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'تم تقديم الطلب بنجاح',
-            'data' => new TrainingRequestResource($trainingRequest),
-        ], 201);
+        return $this->success(new TrainingRequestResource($trainingRequest), 'تم تقديم الطلب بنجاح', 201);
     }
 
     public function changeStatus(ChangeRequestStatusRequest $request, string $id)
@@ -57,10 +50,6 @@ class TrainingRequestController extends Controller
         $trainingRequest = TrainingRequest::findOrFail($id);
         $trainingRequest->update($request->validated());
 
-        return response()->json([
-            'success' => true,
-            'message' => 'تم تحديث حالة الطلب بنجاح',
-            'data' => new TrainingRequestResource($trainingRequest),
-        ], 200);
+        return $this->success(new TrainingRequestResource($trainingRequest), 'تم تحديث حالة الطلب بنجاح', 200);
     }
 }

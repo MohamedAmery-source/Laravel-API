@@ -11,9 +11,6 @@ class RoleController extends Controller
     {
         $roles = Role::with('permissions')->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => $roles,
-        ], 200);
+        return $this->success($roles, null, 200);
     }
 }
