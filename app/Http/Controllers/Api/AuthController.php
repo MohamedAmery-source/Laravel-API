@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Resources\UserResource;
-use App\Models\Institution;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -28,19 +27,12 @@ class AuthController extends Controller
                 'status' => 'active'
             ]);
 
-            if ($fields['user_type'] === 'student') {
-                Student::create([
-                    'user_id' => $user->user_id,
-                    'student_number' => $request->student_number ?? 'STU-' . rand(1000, 9999),
-                    'department' => $request->department ?? 'General',
-                    'level' => $request->level ?? 'Level 1',
-                ]);
-            } elseif ($fields['user_type'] === 'institution') {
-                Institution::create([
-                    'user_id' => $user->user_id,
-                    'name' => $request->institution_name ?? $fields['full_name'],
-                ]);
-            }
+            Student::create([
+                'user_id' => $user->user_id,
+                'student_number' => $request->student_number ?? 'STU-' . rand(1000, 9999),
+                'department' => $request->department ?? 'General',
+                'level' => $request->level ?? 'Level 1',
+            ]);
 
             $token = $user->createToken('auth_token')->plainTextToken;
             $user->load(['student', 'institution']);
