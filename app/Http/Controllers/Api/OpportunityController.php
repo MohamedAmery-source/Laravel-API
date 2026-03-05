@@ -19,16 +19,24 @@ class OpportunityController extends Controller
             $query->where('institution_id', $request->institution_id);
         }
 
-        $opportunities = $query->get();
-
-        return $this->success(OpportunityResource::collection($opportunities), null, 200);
+        return $this->success(OpportunityResource::collection($query->get()), null, 200);
     }
 
     public function store(StoreOpportunityRequest $request)
     {
-        $opportunity = TrainingOpportunity::create($request->validated());
+        $data = $request->validated();
 
-        return $this->success(new OpportunityResource($opportunity), 'تم إضافة الفرصة التدريبية بنجاح', 201);
+        if (empty($data['institution_id']) && $request->user()?->institution) {
+            $data['institution_id'] = $request->user()->institution->institution_id;
+        }
+
+        if (empty($data['institution_id'])) {
+            return $this->error('institution_id is required', 422);
+        }
+
+        $opportunity = TrainingOpportunity::create($data);
+
+        return $this->success(new OpportunityResource($opportunity), 'Opportunity created successfully', 201);
     }
 
     public function show(string $id)
@@ -43,7 +51,7 @@ class OpportunityController extends Controller
         $opportunity = TrainingOpportunity::findOrFail($id);
         $opportunity->update($request->validated());
 
-        return $this->success(new OpportunityResource($opportunity), 'تم تحديث الفرصة التدريبية بنجاح', 200);
+        return $this->success(new OpportunityResource($opportunity), 'Opportunity updated successfully', 200);
     }
 
     public function destroy(string $id)
@@ -51,6 +59,6 @@ class OpportunityController extends Controller
         $opportunity = TrainingOpportunity::findOrFail($id);
         $opportunity->update(['is_active' => false]);
 
-        return $this->success(null, 'تم إخفاء الفرصة التدريبية بنجاح', 200);
+        return $this->success(null, 'Opportunity hidden successfully', 200);
     }
 }
