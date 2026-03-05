@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class UpdateInstitutionRequest extends FormRequest
 {
@@ -14,14 +13,7 @@ class UpdateInstitutionRequest extends FormRequest
 
     public function rules(): array
     {
-        $institutionId = $this->route('institution') ?? $this->route('id');
-
         return [
-            'user_id' => [
-                'sometimes',
-                'exists:users,user_id',
-                Rule::unique('institutions', 'user_id')->ignore($institutionId, 'institution_id'),
-            ],
             'name' => 'sometimes|string|max:150',
             'address' => 'nullable|string',
             'description' => 'nullable|string',

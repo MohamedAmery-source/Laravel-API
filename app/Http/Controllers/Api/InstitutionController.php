@@ -7,6 +7,9 @@ use App\Http\Requests\StoreInstitutionRequest;
 use App\Http\Requests\UpdateInstitutionRequest;
 use App\Http\Resources\InstitutionResource;
 use App\Models\Institution;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class InstitutionController extends Controller
 {
@@ -19,9 +22,32 @@ class InstitutionController extends Controller
 
     public function store(StoreInstitutionRequest $request)
     {
-        $institution = Institution::create($request->validated());
+        $data = $request->validated();
 
-        return $this->success(new InstitutionResource($institution), 'تم إنشاء المؤسسة بنجاح', 201);
+        $institution = DB::transaction(function () use ($data) {
+            $user = User::create([
+                'full_name' => $data['full_name'],
+                'email' => $data['email'],
+                'password' => Hash::make($data['password']),
+                'phone' => $data['phone'] ?? null,
+                'user_type' => 'institution',
+                'status' => 'active',
+                'is_active' => true,
+            ]);
+
+            return Institution::create([
+                'user_id' => $user->user_id,
+                'name' => $data['name'],
+                'address' => $data['address'] ?? null,
+                'description' => $data['description'] ?? null,
+                'website' => $data['website'] ?? null,
+                'contact_person' => $data['contact_person'] ?? null,
+                'contact_phone' => $data['contact_phone'] ?? null,
+                'is_active' => $data['is_active'] ?? true,
+            ]);
+        });
+
+        return $this->success(new InstitutionResource($institution), 'Institution created successfully', 201);
     }
 
     public function show(string $id)
@@ -36,7 +62,7 @@ class InstitutionController extends Controller
         $institution = Institution::findOrFail($id);
         $institution->update($request->validated());
 
-        return $this->success(new InstitutionResource($institution), 'تم تحديث بيانات المؤسسة بنجاح', 200);
+        return $this->success(new InstitutionResource($institution), 'Institution updated successfully', 200);
     }
 
     public function destroy(string $id)
@@ -44,6 +70,6 @@ class InstitutionController extends Controller
         $institution = Institution::findOrFail($id);
         $institution->update(['is_active' => false]);
 
-        return $this->success(null, 'تم تعطيل المؤسسة بنجاح', 200);
+        return $this->success(null, 'Institution deactivated successfully', 200);
     }
 }
