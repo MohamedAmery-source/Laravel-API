@@ -1,0 +1,142 @@
+<?php
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | المسارات المسموح بها
+    |--------------------------------------------------------------------------
+    |
+    | هذه المسارات هي التي سيتم تطبيق سياسات CORS عليها
+    | قمت بتضمين جميع مسارات API الخاصة بمشروعي
+    |
+    */
+    'paths' => [
+    'api/education/*',
+    'api/education/login',
+    'api/education/logout',
+    'api/education/register',
+    'api/education/profile',
+    'api/education/change-password',
+    'api/education/opportunities',
+    'api/education/opportunities/*',
+    'api/education/students/*',
+    'api/education/institutions',
+    'api/education/institutions/*',
+    'api/education/training-requests',
+    'api/education/training-requests/*',
+    'api/education/internships',
+    'api/education/internships/*',
+    'api/education/evaluations',
+    'api/education/evaluations/*',
+    'api/education/reports',
+    'api/education/reports/*',
+    'api/education/documents/upload',
+    'api/education/complaints',
+    'api/education/complaints/*',
+    'api/education/notifications',
+    'api/education/notifications/*',
+    'api/education/settings',
+    'api/education/settings/*',
+    'api/education/lookups',
+    'api/education/lookups/*',
+    'api/education/roles',
+    'api/education/roles/*',
+    'api/education/sanctum/csrf-cookie',
+],
+
+    /*
+    |--------------------------------------------------------------------------
+    | طرق HTTP المسموحة
+    |--------------------------------------------------------------------------
+    |
+    | حددت طرق HTTP التي يحتاجها مشروعي
+    |
+    */
+    'allowed_methods' => ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | النطاقات المسموح لها بالوصول
+    |--------------------------------------------------------------------------
+    |
+    | هنا أحدد عناوين تطبيق الواجهة الأمامية (Frontend) المسموح لها
+    | باستخدام API الخاص بي. أضفت النطاقات المحلية للتطوير
+    |
+    */
+    'allowed_origins' => [
+        'http://localhost:3000',           // لتطبيقات React
+        'http://localhost:5173',           // لتطبيقات Vite (Vue/React)
+        'http://localhost:8080',           // لتطبيقات Vue CLI
+        'http://localhost:4200',           // لتطبيقات Angular
+        'http://127.0.0.1:8000',           // للسيرفر المحلي
+        'http://localhost:8000',            // للسيرفر المحلي
+        'http://localhost',                  // للتجربة
+        'http://127.0.0.1',                  // للتجربة
+        // عند رفع المشروع للإنتاج، سأضيف نطاقات الإنتاج هنا
+        // مثال: 'https://training-frontend.com',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | أنماط Regex للنطاقات المسموحة
+    |--------------------------------------------------------------------------
+    |
+    | استخدمت هذه الخاصية للسماح بجميع النطاقات المحلية بغض النظر عن المنفذ
+    |
+    */
+    'allowed_origins_patterns' => [
+        '/^http:\/\/localhost:\d+$/',     // يسمح بأي منفذ على localhost
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | الـ Headers المسموح بها في الطلبات
+    |--------------------------------------------------------------------------
+    |
+    | هذه هي الـ headers التي سيسمح للـ Frontend بإرسالها
+    | اخترتها بناءً على احتياجات مشروعي
+    |
+    */
+    'allowed_headers' => [
+        'Content-Type',           // لتحديد نوع المحتوى (JSON, form-data)
+        'X-Requested-With',       // للتعرف على طلبات AJAX
+        'Authorization',          // لإرسال Bearer token
+        'Accept',                 // لتحديد نوع الاستجابة المطلوبة
+        'Origin',                 // لتحديد مصدر الطلب
+        'X-CSRF-TOKEN',           // للحماية من CSRF (إذا استخدمتها)
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | الـ Headers المسموح للـ Frontend بقراءتها
+    |--------------------------------------------------------------------------
+    |
+    | هذه الـ headers سأسمح للـ Frontend بالوصول إليها من الاستجابة
+    |
+    */
+    'exposed_headers' => [
+        'Authorization',          // للتعامل مع تجديد التوكن
+        'X-Total-Count',          // لعرض العدد الإجمالي في قوائم pagination
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | مدة التخزين المؤقت لطلبات OPTIONS
+    |--------------------------------------------------------------------------
+    |
+    | لتقليل عدد طلبات preflight، خزنت النتيجة لمدة 24 ساعة
+    |
+    */
+    'max_age' => 86400, // 24 ساعة - يقلل من طلبات OPTIONS المتكررة
+
+    /*
+    |--------------------------------------------------------------------------
+    | دعم إرسال التوثيق (Cookies, Authorization headers)
+    |--------------------------------------------------------------------------
+    |
+    | فعلت هذه الخاصية لأن مشروعي يعتمد على Bearer tokens في التوثيق
+    | مهم: عندما تكون هذه الخاصية true، لا يمكن استخدام '*' في allowed_origins
+    |
+    */
+    'supports_credentials' => true,
+];

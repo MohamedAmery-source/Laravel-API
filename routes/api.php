@@ -69,6 +69,10 @@ $registerEducationRoutes = function (string $prefix = ''): void {
             Route::get('roles', [RoleController::class, 'index']);
         });
     });
+    Route::options('/{any}', function () {
+    return response('', 200);
+})->where('any', '.*');
+
 };
 
 // Laravel default API prefix: /api/...
