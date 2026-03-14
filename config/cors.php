@@ -10,39 +10,13 @@ return [
     | قمت بتضمين جميع مسارات API الخاصة بمشروعي
     |
     */
+    // Laravel API routes are prefixed with /api, and this project additionally
+    // registers multiple client prefixes under that. Cover them all here.
     'paths' => [
-    'api/education/*',
-    'api/education/login',
-    'api/education/logout',
-    'api/education/register',
-    'api/education/profile',
-    'api/education/change-password',
-    'api/education/opportunities',
-    'api/education/opportunities/*',
-    'api/education/students/*',
-    'api/education/institutions',
-    'api/education/institutions/*',
-    'api/education/training-requests',
-    'api/education/training-requests/*',
-    'api/education/internships',
-    'api/education/internships/*',
-    'api/education/evaluations',
-    'api/education/evaluations/*',
-    'api/education/reports',
-    'api/education/reports/*',
-    'api/education/documents/upload',
-    'api/education/complaints',
-    'api/education/complaints/*',
-    'api/education/notifications',
-    'api/education/notifications/*',
-    'api/education/settings',
-    'api/education/settings/*',
-    'api/education/lookups',
-    'api/education/lookups/*',
-    'api/education/roles',
-    'api/education/roles/*',
-    'api/education/sanctum/csrf-cookie',
-],
+        'api/*',
+        // Only needed for cookie-based Sanctum SPA auth (not required for bearer tokens).
+        'sanctum/csrf-cookie',
+    ],
 
     /*
     |--------------------------------------------------------------------------
