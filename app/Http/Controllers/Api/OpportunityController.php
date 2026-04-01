@@ -25,6 +25,11 @@ class OpportunityController extends Controller
     public function store(StoreOpportunityRequest $request)
     {
         $data = $request->validated();
+        $authUser = $request->user();
+
+        if ($authUser && $authUser->user_type === 'institution' && (!$authUser->is_active || $authUser->status !== 'active')) {
+            return $this->error('Institution account is not approved or is suspended.', 403);
+        }
 
         if (empty($data['institution_id']) && $request->user()?->institution) {
             $data['institution_id'] = $request->user()->institution->institution_id;

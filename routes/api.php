@@ -1,6 +1,11 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Api\Admin\InstitutionManagementController;
+use App\Http\Controllers\Api\Admin\InternshipMonitorController;
+use App\Http\Controllers\Api\Admin\RequestReviewController;
+use App\Http\Controllers\Api\Admin\StudentManagementController;
 use App\Http\Controllers\Api\ComplaintController;
 use App\Http\Controllers\Api\DocumentController;
 use App\Http\Controllers\Api\EvaluationController;
@@ -67,6 +72,29 @@ $registerEducationRoutes = function (string $prefix = ''): void {
             Route::get('settings', [SettingController::class, 'index']);
             Route::put('settings', [SettingController::class, 'update']);
             Route::get('roles', [RoleController::class, 'index']);
+
+            Route::prefix('admin')->group(function () {
+                Route::get('dashboard-stats', [AdminDashboardController::class, 'stats']);
+
+                Route::get('students', [StudentManagementController::class, 'index']);
+                Route::post('students', [StudentManagementController::class, 'store']);
+                Route::put('students/{id}', [StudentManagementController::class, 'update']);
+                Route::patch('students/{id}/status', [StudentManagementController::class, 'changeStatus']);
+
+                Route::get('institutions', [InstitutionManagementController::class, 'index']);
+                Route::post('institutions', [InstitutionManagementController::class, 'store']);
+                Route::put('institutions/{id}', [InstitutionManagementController::class, 'update']);
+                Route::patch('institutions/{id}/approve', [InstitutionManagementController::class, 'approve']);
+                Route::patch('institutions/{id}/status', [InstitutionManagementController::class, 'changeStatus']);
+
+                Route::get('requests', [RequestReviewController::class, 'index']);
+                Route::get('requests/{id}', [RequestReviewController::class, 'show']);
+                Route::patch('requests/{id}/approve', [RequestReviewController::class, 'approve']);
+                Route::patch('requests/{id}/reject', [RequestReviewController::class, 'reject']);
+
+                Route::get('internships', [InternshipMonitorController::class, 'index']);
+                Route::get('internships/{id}', [InternshipMonitorController::class, 'show']);
+            });
         });
     });
     Route::options('/{any}', function () {
