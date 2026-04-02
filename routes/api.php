@@ -78,7 +78,7 @@ $registerEducationRoutes = function (string $prefix = ''): void {
 
                 Route::get('students', [StudentManagementController::class, 'index']);
                 Route::post('students', [StudentManagementController::class, 'store']);
-                Route::put('students/{id}', [StudentManagementController::class, 'update']);
+                 Route::put('students/{id}', [StudentManagementController::class, 'update']);
                 Route::patch('students/{id}/status', [StudentManagementController::class, 'changeStatus']);
 
                 Route::get('institutions', [InstitutionManagementController::class, 'index']);
