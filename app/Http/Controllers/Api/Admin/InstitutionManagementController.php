@@ -104,7 +104,7 @@ class InstitutionManagementController extends AdminController
             'institution_id' => $institution->institution_id,
             'name' => $institution->name,
             'status' => $institution->user?->status === 'inactive' ? 'pending_approval' : $institution->user?->status,
-        ], 'Institution created successfully.', 201);
+        ], 'تم إنشاء الجهة التدريبية بنجاح.', 201);
     }
 
     public function update(AdminUpdateInstitutionRequest $request, string $id)
@@ -115,7 +115,7 @@ class InstitutionManagementController extends AdminController
 
         $institution = Institution::query()->with('user')->find($id);
         if (!$institution) {
-            return $this->error('Institution not found for the provided id.', 404);
+            return $this->error('لم يتم العثور على الجهة التدريبية للمعرف المرسل.', 404);
         }
         $data = $request->validated();
 
@@ -157,7 +157,7 @@ class InstitutionManagementController extends AdminController
             'institution_id' => $institution->institution_id,
             'name' => $institution->name,
             'status' => $institution->user?->status === 'inactive' ? 'pending_approval' : $institution->user?->status,
-        ], 'Institution updated successfully.');
+        ], 'تم تحديث بيانات الجهة التدريبية بنجاح.');
     }
 
     public function approve(Request $request, string $id)
@@ -168,7 +168,7 @@ class InstitutionManagementController extends AdminController
 
         $institution = Institution::query()->with('user')->find($id);
         if (!$institution) {
-            return $this->error('Institution not found for the provided id.', 404);
+            return $this->error('لم يتم العثور على الجهة التدريبية للمعرف المرسل.', 404);
         }
 
         $institution->user()->update([
@@ -180,7 +180,7 @@ class InstitutionManagementController extends AdminController
         return $this->success([
             'institution_id' => $institution->institution_id,
             'status' => 'active',
-        ], 'Institution approved successfully.');
+        ], 'تم اعتماد الجهة التدريبية بنجاح.');
     }
 
     public function changeStatus(AdminChangeInstitutionStatusRequest $request, string $id)
@@ -191,7 +191,7 @@ class InstitutionManagementController extends AdminController
 
         $institution = Institution::query()->with('user')->find($id);
         if (!$institution) {
-            return $this->error('Institution not found for the provided id.', 404);
+            return $this->error('لم يتم العثور على الجهة التدريبية للمعرف المرسل.', 404);
         }
         $status = $request->validated()['status'];
         $isActive = $status === 'active';
@@ -207,6 +207,6 @@ class InstitutionManagementController extends AdminController
         return $this->success([
             'institution_id' => $institution->institution_id,
             'status' => $status,
-        ], 'Institution status updated successfully.');
+        ], 'تم تحديث حالة الجهة التدريبية بنجاح.');
     }
 }

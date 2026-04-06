@@ -30,8 +30,11 @@ $registerEducationRoutes = function (string $prefix = ''): void {
 
             return response()->json([
                 'success' => false,
-                'message' => 'Use POST for register.',
-            ], 200);
+                'message' => 'استخدم طريقة POST للتسجيل.',
+                'data' => [
+                    'allowed_method' => 'POST',
+                ],
+            ], 405);
         });
 
         Route::any('login', function () {
@@ -41,8 +44,11 @@ $registerEducationRoutes = function (string $prefix = ''): void {
 
             return response()->json([
                 'success' => false,
-                'message' => 'Use POST for login.',
-            ], 200);
+                'message' => 'استخدم طريقة POST لتسجيل الدخول.',
+                'data' => [
+                    'allowed_method' => 'POST',
+                ],
+            ], 405);
         });
 
         Route::get('opportunities', [OpportunityController::class, 'index']);

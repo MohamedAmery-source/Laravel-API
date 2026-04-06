@@ -104,7 +104,7 @@ class StudentManagementController extends AdminController
             'full_name' => $student->user?->full_name,
             'email' => $student->user?->email,
             'status' => $student->user?->status,
-        ], 'Student created successfully.', 201);
+        ], 'تم إنشاء الطالب بنجاح.', 201);
     }
 
     public function update(AdminUpdateStudentRequest $request, string $id)
@@ -115,7 +115,7 @@ class StudentManagementController extends AdminController
 
         $student = Student::query()->with('user')->find($id);
         if (!$student) {
-            return $this->error('Student not found for the provided id.', 404);
+            return $this->error('لم يتم العثور على الطالب للمعرف المرسل.', 404);
         }
         $data = $request->validated();
 
@@ -161,7 +161,7 @@ class StudentManagementController extends AdminController
             'department' => $student->department,
             'level' => $student->level,
             'gpa' => $student->gpa,
-        ], 'Student updated successfully.');
+        ], 'تم تحديث بيانات الطالب بنجاح.');
     }
 
     public function changeStatus(AdminChangeStudentStatusRequest $request, string $id)
@@ -172,7 +172,7 @@ class StudentManagementController extends AdminController
 
         $student = Student::query()->with('user')->find($id);
         if (!$student) {
-            return $this->error('Student not found for the provided id.', 404);
+            return $this->error('لم يتم العثور على الطالب للمعرف المرسل.', 404);
         }
         $status = $request->validated()['status'];
         $isActive = $status === 'active';
@@ -188,6 +188,6 @@ class StudentManagementController extends AdminController
         return $this->success([
             'student_id' => $student->student_id,
             'status' => $status,
-        ], 'Student status updated successfully.');
+        ], 'تم تحديث حالة الطالب بنجاح.');
     }
 }

@@ -82,7 +82,7 @@ class InternshipMonitorController extends AdminController
             ])
             ->find($id);
         if (!$internship) {
-            return $this->error('Internship not found for the provided id.', 404);
+            return $this->error('لم يتم العثور على التدريب للمعرف المرسل.', 404);
         }
 
         $data = [

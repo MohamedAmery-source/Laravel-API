@@ -28,7 +28,7 @@ class OpportunityController extends Controller
         $authUser = $request->user();
 
         if ($authUser && $authUser->user_type === 'institution' && (!$authUser->is_active || $authUser->status !== 'active')) {
-            return $this->error('Institution account is not approved or is suspended.', 403);
+            return $this->error('حساب الجهة التدريبية غير معتمد أو موقوف.', 403);
         }
 
         if (empty($data['institution_id']) && $request->user()?->institution) {
@@ -36,12 +36,12 @@ class OpportunityController extends Controller
         }
 
         if (empty($data['institution_id'])) {
-            return $this->error('institution_id is required', 422);
+            return $this->error('حقل institution_id مطلوب.', 422);
         }
 
         $opportunity = TrainingOpportunity::create($data);
 
-        return $this->success(new OpportunityResource($opportunity), 'Opportunity created successfully', 201);
+        return $this->success(new OpportunityResource($opportunity), 'تم إنشاء الفرصة بنجاح.', 201);
     }
 
     public function show(string $id)
@@ -56,7 +56,7 @@ class OpportunityController extends Controller
         $opportunity = TrainingOpportunity::findOrFail($id);
         $opportunity->update($request->validated());
 
-        return $this->success(new OpportunityResource($opportunity), 'Opportunity updated successfully', 200);
+        return $this->success(new OpportunityResource($opportunity), 'تم تحديث الفرصة بنجاح.', 200);
     }
 
     public function destroy(string $id)
@@ -64,6 +64,6 @@ class OpportunityController extends Controller
         $opportunity = TrainingOpportunity::findOrFail($id);
         $opportunity->update(['is_active' => false]);
 
-        return $this->success(null, 'Opportunity hidden successfully', 200);
+        return $this->success(null, 'تم إخفاء الفرصة بنجاح.', 200);
     }
 }

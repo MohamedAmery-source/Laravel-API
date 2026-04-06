@@ -31,7 +31,7 @@ class ApiFormRequest extends FormRequest
     {
         throw new HttpResponseException(response()->json([
             'success' => false,
-            'message' => 'Validation failed.',
+            'message' => 'فشل التحقق من صحة البيانات.',
             'data' => $validator->errors(),
         ], 422, [], JSON_UNESCAPED_UNICODE));
     }
@@ -43,7 +43,7 @@ class ApiFormRequest extends FormRequest
     {
         throw new HttpResponseException(response()->json([
             'success' => false,
-            'message' => 'Forbidden.',
+            'message' => 'غير مسموح.',
             'data' => null,
         ], 403, [], JSON_UNESCAPED_UNICODE));
     }

@@ -24,12 +24,12 @@ class AuthController extends Controller
                 'email' => $fields['email'],
                 'password' => Hash::make($fields['password']),
                 'user_type' => $fields['user_type'],
-                'status' => 'active'
+                'status' => 'active',
             ]);
 
             Student::create([
                 'user_id' => $user->user_id,
-                'student_number' => $request->student_number ?? 'STU-' . rand(1000, 9999),
+                'student_number' => $request->student_number ?? 'STU-'.random_int(1000, 9999),
                 'department' => $request->department ?? 'General',
                 'level' => $request->level ?? 'Level 1',
             ]);
@@ -39,27 +39,23 @@ class AuthController extends Controller
 
             return $this->success([
                 'user' => new UserResource($user),
-                'token' => $token
+                'token' => $token,
             ], 'تم إنشاء الحساب بنجاح', 201);
         });
     }
 
     public function login(LoginRequest $request)
     {
-        $fields = $request->validated();
+        $request->validated();
+        $request->authenticate();
 
-        $user = User::where('email', $fields['email'])->first();
-
-        if (!$user || !Hash::check($fields['password'], $user->password)) {
-            return $this->error('بيانات الدخول غير صحيحة', 401);
-        }
-
+        $user = $request->user();
         $token = $user->createToken('auth_token')->plainTextToken;
         $user->load(['student', 'institution']);
 
         return $this->success([
             'user' => new UserResource($user),
-            'token' => $token
+            'token' => $token,
         ], 'تم تسجيل الدخول بنجاح', 200);
     }
 
@@ -79,7 +75,7 @@ class AuthController extends Controller
 
         $user = $request->user();
 
-        if (!$user || !Hash::check($fields['current_password'], $user->password)) {
+        if (! $user || ! Hash::check($fields['current_password'], $user->password)) {
             return $this->error('كلمة المرور الحالية غير صحيحة', 422);
         }
 

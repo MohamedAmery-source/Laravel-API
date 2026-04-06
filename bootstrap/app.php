@@ -47,7 +47,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 return null;
             }
 
-            return $jsonError('Validation failed.', 422, $e->errors());
+            return $jsonError('فشل التحقق من صحة البيانات.', 422, $e->errors());
         });
 
         $exceptions->render(function (AuthenticationException $e, Request $request) use ($jsonError, $isApi) {
@@ -55,7 +55,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 return null;
             }
 
-            return $jsonError('Unauthenticated.', 401);
+            return $jsonError('غير مصرح. يرجى تسجيل الدخول.', 401);
         });
 
         $exceptions->render(function (AuthorizationException $e, Request $request) use ($jsonError, $isApi) {
@@ -63,7 +63,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 return null;
             }
 
-            return $jsonError('Forbidden.', 403);
+            return $jsonError('غير مسموح.', 403);
         });
 
         $exceptions->render(function (ModelNotFoundException $e, Request $request) use ($jsonError, $isApi) {
@@ -71,7 +71,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 return null;
             }
 
-            return $jsonError('Record not found for the provided id.', 404);
+            return $jsonError('لم يتم العثور على السجل للمعرف المرسل.', 404);
         });
 
         $exceptions->render(function (NotFoundHttpException $e, Request $request) use ($jsonError, $isApi) {
@@ -79,7 +79,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 return null;
             }
 
-            return $jsonError('Endpoint not found.', 404);
+            return $jsonError('نقطة النهاية غير موجودة.', 404);
         });
 
         $exceptions->render(function (MethodNotAllowedHttpException $e, Request $request) use ($jsonError, $isApi) {
@@ -87,7 +87,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 return null;
             }
 
-            return $jsonError('HTTP method not allowed for this endpoint.', 405);
+            return $jsonError('طريقة الطلب غير مسموحة لهذه الواجهة.', 405);
         });
 
         $exceptions->render(function (QueryException $e, Request $request) use ($jsonError, $isApi) {
@@ -95,7 +95,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 return null;
             }
 
-            return $jsonError('Database operation failed. Please check your input and try again.', 422);
+            return $jsonError('فشلت عملية قاعدة البيانات. يرجى مراجعة البيانات وإعادة المحاولة.', 422);
         });
 
         $exceptions->render(function (Throwable $e, Request $request) use ($jsonError, $isApi) {
@@ -103,6 +103,6 @@ return Application::configure(basePath: dirname(__DIR__))
                 return null;
             }
 
-            return $jsonError('Unexpected server error.', 500);
+            return $jsonError('حدث خطأ غير متوقع في الخادم.', 500);
         });
     })->create();

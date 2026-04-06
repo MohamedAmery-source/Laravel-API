@@ -81,7 +81,7 @@ class RequestReviewController extends AdminController
             ])
             ->find($id);
         if (!$trainingRequest) {
-            return $this->error('Training request not found for the provided id.', 404);
+            return $this->error('لم يتم العثور على طلب التدريب للمعرف المرسل.', 404);
         }
 
         $data = [
@@ -135,11 +135,11 @@ class RequestReviewController extends AdminController
             ->with(['student.user', 'opportunity.institution.user'])
             ->find($id);
         if (!$trainingRequest) {
-            return $this->error('Training request not found for the provided id.', 404);
+            return $this->error('لم يتم العثور على طلب التدريب للمعرف المرسل.', 404);
         }
 
         if (!in_array($trainingRequest->status, ['pending_admin', 'pending'], true)) {
-            return $this->error('Only pending admin requests can be approved.', 422);
+            return $this->error('يمكن اعتماد الطلبات التي بانتظار الإدارة فقط.', 422);
         }
 
         $data = $request->validated();
@@ -153,7 +153,7 @@ class RequestReviewController extends AdminController
             if ($trainingRequest->student?->user_id) {
                 Notification::query()->create([
                     'user_id' => $trainingRequest->student->user_id,
-                    'message' => 'Your request has been approved academically and forwarded to the institution.',
+                    'message' => 'تمت الموافقة الأكاديمية على طلبك وتم تحويله إلى الجهة التدريبية.',
                     'notification_type' => 'request_forwarded',
                     'related_request_id' => $trainingRequest->request_id,
                     'is_read' => false,
@@ -164,7 +164,7 @@ class RequestReviewController extends AdminController
         return $this->success([
             'request_id' => $trainingRequest->request_id,
             'status' => 'pending_institution',
-        ], 'Request approved and forwarded successfully.');
+        ], 'تم اعتماد الطلب وتحويله بنجاح.');
     }
 
     public function reject(AdminRejectRequestRequest $request, string $id)
@@ -175,11 +175,11 @@ class RequestReviewController extends AdminController
 
         $trainingRequest = TrainingRequest::query()->with('student.user')->find($id);
         if (!$trainingRequest) {
-            return $this->error('Training request not found for the provided id.', 404);
+            return $this->error('لم يتم العثور على طلب التدريب للمعرف المرسل.', 404);
         }
 
         if (!in_array($trainingRequest->status, ['pending_admin', 'pending'], true)) {
-            return $this->error('Only pending admin requests can be rejected.', 422);
+            return $this->error('يمكن رفض الطلبات التي بانتظار الإدارة فقط.', 422);
         }
 
         $data = $request->validated();
@@ -193,7 +193,7 @@ class RequestReviewController extends AdminController
             if ($trainingRequest->student?->user_id) {
                 Notification::query()->create([
                     'user_id' => $trainingRequest->student->user_id,
-                    'message' => 'Your request was rejected academically. Reason: ' . $data['admin_notes'],
+                    'message' => 'تم رفض طلبك أكاديميًا. السبب: '.$data['admin_notes'],
                     'notification_type' => 'request_rejected',
                     'related_request_id' => $trainingRequest->request_id,
                     'is_read' => false,
@@ -205,6 +205,6 @@ class RequestReviewController extends AdminController
             'request_id' => $trainingRequest->request_id,
             'status' => 'rejected',
             'admin_notes' => $data['admin_notes'],
-        ], 'Request rejected successfully.');
+        ], 'تم رفض الطلب بنجاح.');
     }
 }

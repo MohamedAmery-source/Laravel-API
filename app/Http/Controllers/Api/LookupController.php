@@ -14,7 +14,7 @@ class LookupController extends Controller
         $type = $request->query('type');
 
         if (!$type) {
-            return $this->error('Type query parameter is required', 422);
+            return $this->error('المعامل type مطلوب في الاستعلام.', 422);
         }
 
         $master = LookupMaster::where('lookup_code', $type)->first();
