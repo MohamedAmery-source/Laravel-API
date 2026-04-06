@@ -2,10 +2,10 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\ApiFormRequest;
 use Illuminate\Validation\Rule;
 
-class UpdateStudentRequest extends FormRequest
+class UpdateStudentRequest extends ApiFormRequest
 {
     public function authorize(): bool
     {
@@ -35,3 +35,6 @@ class UpdateStudentRequest extends FormRequest
         ];
     }
 }
+
+
+

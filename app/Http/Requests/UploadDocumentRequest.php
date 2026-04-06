@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\ApiFormRequest;
 
-class UploadDocumentRequest extends FormRequest
+class UploadDocumentRequest extends ApiFormRequest
 {
     public function authorize(): bool
     {
@@ -21,3 +21,6 @@ class UploadDocumentRequest extends FormRequest
         ];
     }
 }
+
+
+

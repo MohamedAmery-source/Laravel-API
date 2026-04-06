@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\ApiFormRequest;
 
-class UpdateInstitutionRequest extends FormRequest
+class UpdateInstitutionRequest extends ApiFormRequest
 {
     public function authorize(): bool
     {
@@ -24,3 +24,6 @@ class UpdateInstitutionRequest extends FormRequest
         ];
     }
 }
+
+
+

@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\ApiFormRequest;
 
-class StoreReportRequest extends FormRequest
+class StoreReportRequest extends ApiFormRequest
 {
     public function authorize(): bool
     {
@@ -26,3 +26,6 @@ class StoreReportRequest extends FormRequest
         ];
     }
 }
+
+
+

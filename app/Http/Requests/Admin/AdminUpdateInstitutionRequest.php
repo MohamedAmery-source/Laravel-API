@@ -3,10 +3,10 @@
 namespace App\Http\Requests\Admin;
 
 use App\Models\Institution;
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\ApiFormRequest;
 use Illuminate\Validation\Rule;
 
-class AdminUpdateInstitutionRequest extends FormRequest
+class AdminUpdateInstitutionRequest extends ApiFormRequest
 {
     public function authorize(): bool
     {
@@ -37,3 +37,6 @@ class AdminUpdateInstitutionRequest extends FormRequest
         ];
     }
 }
+
+
+
