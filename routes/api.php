@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\OpportunityController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\SettingController;
 use App\Http\Controllers\Api\StudentController;
+use App\Http\Controllers\Api\StudentPortalController;
 use App\Http\Controllers\Api\TrainingReportController;
 use App\Http\Controllers\Api\TrainingRequestController;
 use Illuminate\Support\Facades\Route;
@@ -130,7 +131,26 @@ $registerEducationRoutes = function (string $prefix = ''): void {
             });
 
             Route::prefix('student')->group(function () {
-                Route::post('requests', [InstitutionPortalController::class, 'studentStoreRequest']);
+                Route::get('profile', [StudentPortalController::class, 'profile']);
+                Route::put('profile', [StudentPortalController::class, 'updateProfile']);
+                Route::post('profile/cv', [StudentPortalController::class, 'uploadCv']);
+
+                Route::get('dashboard-stats', [StudentPortalController::class, 'dashboardStats']);
+                Route::get('timeline', [StudentPortalController::class, 'timeline']);
+
+                Route::get('opportunities', [StudentPortalController::class, 'opportunities']);
+                Route::get('opportunities/{id}', [StudentPortalController::class, 'showOpportunity']);
+                Route::post('opportunities/{id}/apply', [StudentPortalController::class, 'apply']);
+
+                Route::get('requests', [StudentPortalController::class, 'requests']);
+                Route::get('requests/{id}', [StudentPortalController::class, 'showRequest']);
+
+                Route::get('my-internship', [StudentPortalController::class, 'myInternship']);
+                Route::post('my-internship/reports', [StudentPortalController::class, 'storeReport']);
+                Route::get('my-internship/evaluation', [StudentPortalController::class, 'evaluation']);
+
+                Route::get('complaints', [StudentPortalController::class, 'complaints']);
+                Route::post('complaints', [StudentPortalController::class, 'storeComplaint']);
             });
         });
     });

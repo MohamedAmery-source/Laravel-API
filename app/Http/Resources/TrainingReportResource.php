@@ -15,6 +15,7 @@ class TrainingReportResource extends JsonResource
             'title' => $this->title,
             'content' => $this->content,
             'report_file' => $this->report_file,
+            'week_number' => $this->week_number,
             'submitted_by' => $this->submitted_by,
             'submission_date' => $this->submission_date,
             'is_approved' => $this->is_approved,

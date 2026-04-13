@@ -18,6 +18,7 @@ class OpportunityResource extends JsonResource
             'required_skills' => $this->required_skills,
             'available_seats' => $this->available_seats,
             'city' => $this->city,
+            'training_type' => $this->training_type,
             'custom_questions' => $this->custom_questions,
             'status' => $this->status,
             'start_date' => $this->start_date,

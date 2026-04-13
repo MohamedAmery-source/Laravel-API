@@ -24,6 +24,7 @@ class TrainingOpportunity extends Model
         'required_skills',
         'available_seats',
         'city',
+        'training_type',
         'custom_questions',
         'status',
         'start_date',

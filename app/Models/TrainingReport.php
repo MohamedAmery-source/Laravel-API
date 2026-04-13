@@ -16,6 +16,7 @@ class TrainingReport extends Model
         'title',
         'content',
         'report_file',
+        'week_number',
         'submitted_by',
         'submission_date',
         'is_approved',

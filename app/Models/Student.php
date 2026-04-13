@@ -16,10 +16,17 @@ class Student extends Model
     protected $fillable = [
         'user_id',
         'student_number',
+        'university',
         'department',
         'level',
         'gpa',
+        'city',
+        'skills',
         'is_active'
+    ];
+
+    protected $casts = [
+        'skills' => 'array',
     ];
 
     // 3. علاقة عكسية (اختياري لكن مفيد): الطالب يتبع لمستخدم
