@@ -16,6 +16,7 @@ class TrainingRequestResource extends JsonResource
             'submission_date' => $this->submission_date,
             'status' => $this->status,
             'student_notes' => $this->student_notes,
+            'student_answers' => $this->student_answers,
             'admin_notes' => $this->admin_notes,
             'institution_notes' => $this->institution_notes,
             'is_active' => $this->is_active,

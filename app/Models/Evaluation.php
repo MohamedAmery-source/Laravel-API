@@ -19,6 +19,7 @@ class Evaluation extends Model
         'teamwork',
         'attendance',
         'overall_rating',
+        'final_score',
         'comments',
         'evaluation_date',
         'is_active',

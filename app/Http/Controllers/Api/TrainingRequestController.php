@@ -40,6 +40,9 @@ class TrainingRequestController extends Controller
         $data = $request->validated();
         $data['submission_date'] = $data['submission_date'] ?? now()->toDateString();
         $data['status'] = $data['status'] ?? 'pending_admin';
+        if ($request->filled('student_answers_block')) {
+            $data['student_answers'] = (string) $request->input('student_answers_block');
+        }
 
         $trainingRequest = TrainingRequest::create($data);
 

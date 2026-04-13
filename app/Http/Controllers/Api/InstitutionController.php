@@ -31,8 +31,8 @@ class InstitutionController extends Controller
                 'password' => Hash::make($data['password']),
                 'phone' => $data['phone'] ?? null,
                 'user_type' => 'institution',
-                'status' => 'active',
-                'is_active' => true,
+                'status' => 'pending_approval',
+                'is_active' => false,
             ]);
 
             return Institution::create([
@@ -43,11 +43,11 @@ class InstitutionController extends Controller
                 'website' => $data['website'] ?? null,
                 'contact_person' => $data['contact_person'] ?? null,
                 'contact_phone' => $data['contact_phone'] ?? null,
-                'is_active' => $data['is_active'] ?? true,
+                'is_active' => $data['is_active'] ?? false,
             ]);
         });
 
-        return $this->success(new InstitutionResource($institution), 'Institution created successfully', 201);
+        return $this->success(new InstitutionResource($institution), 'تم إنشاء حساب المؤسسة بنجاح وهو الآن بانتظار اعتماد الإدارة.', 201);
     }
 
     public function show(string $id)
@@ -62,7 +62,7 @@ class InstitutionController extends Controller
         $institution = Institution::findOrFail($id);
         $institution->update($request->validated());
 
-        return $this->success(new InstitutionResource($institution), 'Institution updated successfully', 200);
+        return $this->success(new InstitutionResource($institution), 'تم تحديث بيانات المؤسسة بنجاح.', 200);
     }
 
     public function destroy(string $id)
@@ -70,6 +70,6 @@ class InstitutionController extends Controller
         $institution = Institution::findOrFail($id);
         $institution->update(['is_active' => false]);
 
-        return $this->success(null, 'Institution deactivated successfully', 200);
+        return $this->success(null, 'تم تعطيل المؤسسة بنجاح.', 200);
     }
 }

@@ -40,7 +40,7 @@ class AuthController extends Controller
             return $this->success([
                 'user' => new UserResource($user),
                 'token' => $token,
-            ], 'تم إنشاء الحساب بنجاح', 201);
+            ], 'تم إنشاء الحساب بنجاح.', 201);
         });
     }
 
@@ -56,14 +56,14 @@ class AuthController extends Controller
         return $this->success([
             'user' => new UserResource($user),
             'token' => $token,
-        ], 'تم تسجيل الدخول بنجاح', 200);
+        ], 'تم تسجيل الدخول بنجاح.', 200);
     }
 
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
 
-        return $this->success(null, 'تم تسجيل الخروج بنجاح');
+        return $this->success(null, 'تم تسجيل الخروج بنجاح.');
     }
 
     public function changePassword(Request $request)
@@ -75,14 +75,14 @@ class AuthController extends Controller
 
         $user = $request->user();
 
-        if (! $user || ! Hash::check($fields['current_password'], $user->password)) {
-            return $this->error('كلمة المرور الحالية غير صحيحة', 422);
+        if (!$user || !Hash::check($fields['current_password'], $user->password)) {
+            return $this->error('كلمة المرور الحالية غير صحيحة.', 422);
         }
 
         $user->password = Hash::make($fields['new_password']);
         $user->save();
 
-        return $this->success(null, 'تم تحديث كلمة المرور بنجاح', 200);
+        return $this->success(null, 'تم تحديث كلمة المرور بنجاح.', 200);
     }
 
     public function profile(Request $request)

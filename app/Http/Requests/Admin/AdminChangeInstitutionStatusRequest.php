@@ -14,7 +14,7 @@ class AdminChangeInstitutionStatusRequest extends ApiFormRequest
     public function rules(): array
     {
         return [
-            'status' => 'required|in:active,suspended',
+            'status' => 'required|in:active,pending_approval,suspended',
         ];
     }
 }

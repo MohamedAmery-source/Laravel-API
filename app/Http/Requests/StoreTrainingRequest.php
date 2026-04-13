@@ -18,6 +18,7 @@ class StoreTrainingRequest extends ApiFormRequest
             'opportunity_id' => 'required|exists:training_opportunities,opportunity_id',
             'submission_date' => 'nullable|date',
             'student_notes' => 'nullable|string',
+            'student_answers_block' => 'nullable|string',
         ];
     }
 }

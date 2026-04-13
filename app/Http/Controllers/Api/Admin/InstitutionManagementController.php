@@ -35,9 +35,8 @@ class InstitutionManagementController extends AdminController
 
         if ($request->filled('status')) {
             $status = (string) $request->query('status');
-            $mappedStatus = $status === 'pending_approval' ? 'inactive' : $status;
-            $query->whereHas('user', function ($q) use ($mappedStatus) {
-                $q->where('status', $mappedStatus);
+            $query->whereHas('user', function ($q) use ($status) {
+                $q->where('status', $status);
             });
         }
 
@@ -52,7 +51,7 @@ class InstitutionManagementController extends AdminController
                     'email' => $institution->user?->email,
                     'full_name' => $institution->user?->full_name,
                     'phone' => $institution->user?->phone,
-                    'status' => $institution->user?->status === 'inactive' ? 'pending_approval' : $institution->user?->status,
+                    'status' => $institution->user?->status,
                     'address' => $institution->address,
                     'contact_person' => $institution->contact_person,
                     'contact_phone' => $institution->contact_phone,
@@ -73,18 +72,17 @@ class InstitutionManagementController extends AdminController
         }
 
         $data = $request->validated();
-        $statusInput = $data['status'] ?? 'pending_approval';
-        $mappedStatus = $statusInput === 'pending_approval' ? 'inactive' : $statusInput;
-        $isActive = $mappedStatus === 'active';
+        $status = $data['status'] ?? 'pending_approval';
+        $isActive = $status === 'active';
 
-        $institution = DB::transaction(function () use ($data, $mappedStatus, $isActive) {
+        $institution = DB::transaction(function () use ($data, $status, $isActive) {
             $user = User::query()->create([
                 'full_name' => $data['full_name'],
                 'email' => $data['email'],
                 'password' => Hash::make($data['password']),
                 'phone' => $data['phone'] ?? null,
                 'user_type' => 'institution',
-                'status' => $mappedStatus,
+                'status' => $status,
                 'is_active' => $isActive,
             ]);
 
@@ -103,7 +101,7 @@ class InstitutionManagementController extends AdminController
         return $this->success([
             'institution_id' => $institution->institution_id,
             'name' => $institution->name,
-            'status' => $institution->user?->status === 'inactive' ? 'pending_approval' : $institution->user?->status,
+            'status' => $institution->user?->status,
         ], 'تم إنشاء الجهة التدريبية بنجاح.', 201);
     }
 
@@ -115,8 +113,9 @@ class InstitutionManagementController extends AdminController
 
         $institution = Institution::query()->with('user')->find($id);
         if (!$institution) {
-            return $this->error('لم يتم العثور على الجهة التدريبية للمعرف المرسل.', 404);
+            return $this->error('لم يتم العثور على الجهة التدريبية المطلوبة.', 404);
         }
+
         $data = $request->validated();
 
         DB::transaction(function () use ($institution, $data) {
@@ -128,10 +127,9 @@ class InstitutionManagementController extends AdminController
             }
 
             if (array_key_exists('status', $data)) {
-                $mappedStatus = $data['status'] === 'pending_approval' ? 'inactive' : $data['status'];
-                $userUpdates['status'] = $mappedStatus;
-                $userUpdates['is_active'] = $mappedStatus === 'active';
-                $institution->is_active = $mappedStatus === 'active';
+                $userUpdates['status'] = $data['status'];
+                $userUpdates['is_active'] = $data['status'] === 'active';
+                $institution->is_active = $data['status'] === 'active';
             }
 
             if (!empty($userUpdates)) {
@@ -156,7 +154,7 @@ class InstitutionManagementController extends AdminController
         return $this->success([
             'institution_id' => $institution->institution_id,
             'name' => $institution->name,
-            'status' => $institution->user?->status === 'inactive' ? 'pending_approval' : $institution->user?->status,
+            'status' => $institution->user?->status,
         ], 'تم تحديث بيانات الجهة التدريبية بنجاح.');
     }
 
@@ -168,7 +166,7 @@ class InstitutionManagementController extends AdminController
 
         $institution = Institution::query()->with('user')->find($id);
         if (!$institution) {
-            return $this->error('لم يتم العثور على الجهة التدريبية للمعرف المرسل.', 404);
+            return $this->error('لم يتم العثور على الجهة التدريبية المطلوبة.', 404);
         }
 
         $institution->user()->update([
@@ -191,8 +189,9 @@ class InstitutionManagementController extends AdminController
 
         $institution = Institution::query()->with('user')->find($id);
         if (!$institution) {
-            return $this->error('لم يتم العثور على الجهة التدريبية للمعرف المرسل.', 404);
+            return $this->error('لم يتم العثور على الجهة التدريبية المطلوبة.', 404);
         }
+
         $status = $request->validated()['status'];
         $isActive = $status === 'active';
 

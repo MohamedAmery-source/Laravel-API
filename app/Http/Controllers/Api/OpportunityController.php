@@ -28,7 +28,7 @@ class OpportunityController extends Controller
         $authUser = $request->user();
 
         if ($authUser && $authUser->user_type === 'institution' && (!$authUser->is_active || $authUser->status !== 'active')) {
-            return $this->error('حساب الجهة التدريبية غير معتمد أو موقوف.', 403);
+            return $this->error('حساب الجهة التدريبية غير معتمد أو موقوف حالياً.', 403);
         }
 
         if (empty($data['institution_id']) && $request->user()?->institution) {

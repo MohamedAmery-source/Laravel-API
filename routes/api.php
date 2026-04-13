@@ -1,15 +1,16 @@
 <?php
 
-use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Api\Admin\InstitutionManagementController;
 use App\Http\Controllers\Api\Admin\InternshipMonitorController;
 use App\Http\Controllers\Api\Admin\RequestReviewController;
 use App\Http\Controllers\Api\Admin\StudentManagementController;
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ComplaintController;
 use App\Http\Controllers\Api\DocumentController;
 use App\Http\Controllers\Api\EvaluationController;
 use App\Http\Controllers\Api\InstitutionController;
+use App\Http\Controllers\Api\InstitutionPortalController;
 use App\Http\Controllers\Api\InternshipController;
 use App\Http\Controllers\Api\LookupController;
 use App\Http\Controllers\Api\NotificationController;
@@ -84,7 +85,7 @@ $registerEducationRoutes = function (string $prefix = ''): void {
 
                 Route::get('students', [StudentManagementController::class, 'index']);
                 Route::post('students', [StudentManagementController::class, 'store']);
-                 Route::put('students/{id}', [StudentManagementController::class, 'update']);
+                Route::put('students/{id}', [StudentManagementController::class, 'update']);
                 Route::patch('students/{id}/status', [StudentManagementController::class, 'changeStatus']);
 
                 Route::get('institutions', [InstitutionManagementController::class, 'index']);
@@ -101,19 +102,44 @@ $registerEducationRoutes = function (string $prefix = ''): void {
                 Route::get('internships', [InternshipMonitorController::class, 'index']);
                 Route::get('internships/{id}', [InternshipMonitorController::class, 'show']);
             });
+
+            Route::prefix('institution')->group(function () {
+                Route::get('profile', [InstitutionPortalController::class, 'profile']);
+                Route::put('profile', [InstitutionPortalController::class, 'updateProfile']);
+                Route::post('profile/logo', [InstitutionPortalController::class, 'uploadLogo']);
+
+                Route::get('dashboard-stats', [InstitutionPortalController::class, 'dashboardStats']);
+
+                Route::get('opportunities', [InstitutionPortalController::class, 'listOpportunities']);
+                Route::post('opportunities', [InstitutionPortalController::class, 'storeOpportunity']);
+                Route::get('opportunities/{id}', [InstitutionPortalController::class, 'showOpportunity']);
+                Route::put('opportunities/{id}', [InstitutionPortalController::class, 'updateOpportunity']);
+                Route::patch('opportunities/{id}/status', [InstitutionPortalController::class, 'changeOpportunityStatus']);
+
+                Route::get('requests', [InstitutionPortalController::class, 'listRequests']);
+                Route::get('requests/{id}', [InstitutionPortalController::class, 'showRequest']);
+                Route::patch('requests/{id}/accept', [InstitutionPortalController::class, 'acceptRequest']);
+                Route::patch('requests/{id}/reject', [InstitutionPortalController::class, 'rejectRequest']);
+
+                Route::get('internships', [InstitutionPortalController::class, 'listInternships']);
+                Route::get('internships/{id}/reports', [InstitutionPortalController::class, 'internshipReports']);
+                Route::post('internships/{id}/evaluate', [InstitutionPortalController::class, 'evaluateInternship']);
+
+                Route::get('complaints', [InstitutionPortalController::class, 'listComplaints']);
+                Route::post('complaints', [InstitutionPortalController::class, 'storeComplaint']);
+            });
+
+            Route::prefix('student')->group(function () {
+                Route::post('requests', [InstitutionPortalController::class, 'studentStoreRequest']);
+            });
         });
     });
-    Route::options('/{any}', function () {
-    return response('', 200);
-})->where('any', '.*');
 
+    Route::options('/{any}', function () {
+        return response('', 200);
+    })->where('any', '.*');
 };
 
-// Laravel default API prefix: /api/...
 $registerEducationRoutes('');
-
-// React: /api/education/...
 $registerEducationRoutes('education');
-
-// Flutter: /api/education/api/...
 $registerEducationRoutes('education/api');

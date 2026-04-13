@@ -19,15 +19,23 @@ class TrainingOpportunity extends Model
     protected $fillable = [
         'institution_id',
         'title',
+        'department',
         'description',
         'required_skills',
         'available_seats',
+        'city',
+        'custom_questions',
+        'status',
         'start_date',
         'end_date',
         'application_deadline',
         'is_active',
         'created_by',
         'updated_by'
+    ];
+
+    protected $casts = [
+        'custom_questions' => 'array',
     ];
 
     // 4. (خطوة متقدمة) ربط الفرصة بالمؤسسة التي طرحتها

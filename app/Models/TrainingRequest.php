@@ -17,6 +17,7 @@ class TrainingRequest extends Model
         'submission_date',
         'status',
         'student_notes',
+        'student_answers',
         'admin_notes',
         'institution_notes',
         'is_active',

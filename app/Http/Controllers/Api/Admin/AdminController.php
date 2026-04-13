@@ -13,11 +13,11 @@ abstract class AdminController extends Controller
         $user = $request->user();
 
         if (!$user || $user->user_type !== 'admin') {
-            return $this->error('غير مسموح. صلاحية المدير فقط.', 403);
+            return $this->error('غير مصرح. هذه الواجهة مخصصة للمدير فقط.', 403);
         }
 
         if (!$user->is_active || $user->status !== 'active') {
-            return $this->error('حساب المدير غير نشط.', 403);
+            return $this->error('حساب المدير غير نشط حالياً.', 403);
         }
 
         return null;

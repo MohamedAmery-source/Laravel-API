@@ -18,6 +18,7 @@ class EvaluationResource extends JsonResource
             'teamwork' => $this->teamwork,
             'attendance' => $this->attendance,
             'overall_rating' => $this->overall_rating,
+            'final_score' => $this->final_score,
             'comments' => $this->comments,
             'evaluation_date' => $this->evaluation_date,
             'is_active' => $this->is_active,
