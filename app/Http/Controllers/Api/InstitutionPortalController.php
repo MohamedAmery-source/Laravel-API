@@ -18,7 +18,7 @@ use Illuminate\Validation\Rule;
 
 class InstitutionPortalController extends Controller
 {
-    private const ACCOUNT_BLOCKED_MESSAGE = 'Your account is pending university review. Please wait until activation.';
+    private const ACCOUNT_BLOCKED_MESSAGE = 'Your account is pending admin review. Please wait until activation.';
 
     public function profile(Request $request): JsonResponse
     {
