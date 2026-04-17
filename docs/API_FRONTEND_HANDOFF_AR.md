@@ -1,264 +1,331 @@
-# دليل API للفرونت (Admin / Institution / Student)
+# دليل الفرونت إند - سير العمليات التفصيلي
 
-هذا الملف مبني من الكود الفعلي في `routes/api.php` و Controllers.
+هذا الملف مخصص لتسليم مطوري الفرونت إند كل ما يلزم لتنفيذ النظام خطوة بخطوة (طالب، مؤسسة، أدمن) مع الحقول والشروط الفعلية من الباك إند.
 
-## 1) قاعدة المسارات المعتمدة
+## 1) قواعد عامة
 
-- المسار الأساسي المقترح للاستخدام في الفرونت: `/api/...`
-- نفس الـ API مسجل أيضًا بنسختين مكررتين:
-- `/api/education/...`
-- `/api/education/api/...`
-- الأفضل توحيد الفرونت على `/api` فقط.
+| البند | المطلوب |
+|---|---|
+| Base URL | `/api` |
+| Headers | `Accept: application/json` |
+| المصادقة | كل المسارات المحمية تحتاج `Authorization: Bearer <token>` |
+| أخطاء التحقق | `422` مع رسالة في `message` وتفاصيل الأخطاء |
+| صلاحيات الدور | أي دور غير مصرح له يرجع `403` |
 
-## 2) المصادقة والتهيئة
+## 2) سياسة الطلاب في النظام
 
-- جميع مسارات `/api` (عدا العامة) تتطلب `Bearer Token` (Laravel Sanctum).
-- Header:
-- `Authorization: Bearer <token>`
-- `Accept: application/json`
+1. إدارة النظام (الأدمن) هي الجهة الأساسية لإضافة الطلاب.
+2. الطالب الذي يضاف من الأدمن يمكنه تسجيل الدخول للنظام حسب حالته (`active`).
+3. لا يوجد شرط إلزامي في مسار التقديم يطابق الجامعة مع متغير بيئة.
+4. التقييد الأساسي يكون عبر صلاحيات الدور وحالة الحساب وليس عبر تحقق جامعة إجباري داخل `apply`.
 
-### مسارات عامة (بدون Token)
+## 3) تدفق الطالب الكامل
 
-| Method | Path | الاستخدام |
-|---|---|---|
-| `POST` (فعليًا) | `/api/register` | تسجيل طالب جديد فقط (`user_type=student`) |
-| `POST` (فعليًا) | `/api/login` | تسجيل الدخول |
-| `GET` | `/api/opportunities` | عرض الفرص النشطة |
-| `GET` | `/api/opportunities/{id}` | تفاصيل فرصة |
-| `GET` | `/api/lookups?type=...` | القيم المرجعية |
-| `OPTIONS` | `/api/{any}` | CORS preflight |
+### المرحلة A: التسجيل والدخول
 
-ملاحظة: `register/login` معرفان كـ `Route::any` لكن الكود يقبل POST فقط ويرجع 405 لباقي الطرق.
+1. `POST /api/register`
+2. Body:
+```json
+{
+  "full_name": "اسم الطالب",
+  "email": "student@example.com",
+  "password": "password123",
+  "password_confirmation": "password123",
+  "user_type": "student",
+  "university": "اسم الجامعة المطابق لإعداد النظام",
+  "student_number": "STU-1001",
+  "department": "Computer Science",
+  "level": "4"
+}
+```
+3. حقول مطلوبة فعليًا: `full_name`, `email`, `password`, `password_confirmation`, `user_type`, `university`.
 
-### مسارات مشتركة بعد تسجيل الدخول
+1. `POST /api/login`
+2. Body:
+```json
+{
+  "email": "student@example.com",
+  "password": "password123"
+}
+```
+3. خزّن `token`.
 
-| Method | Path | الاستخدام |
-|---|---|---|
-| `POST` | `/api/logout` | تسجيل الخروج |
-| `GET` | `/api/profile` | بيانات المستخدم الحالي |
-| `POST` | `/api/change-password` | تغيير كلمة المرور |
-| `POST` | `/api/documents/upload` | رفع ملف عام مرتبط بالمستخدم/طلب تدريب |
-| `GET` | `/api/notifications` | إشعارات المستخدم الحالي |
-| `GET` | `/api/complaints` | قائمة الشكاوى (General API) |
-| `POST` | `/api/complaints` | إنشاء شكوى (General API) |
-| `GET` | `/api/complaints/{complaint}` | تفاصيل شكوى |
-| `GET` | `/api/settings` | إعدادات عامة |
-| `PUT` | `/api/settings` | تحديث الإعدادات |
-| `GET` | `/api/roles` | الأدوار والصلاحيات |
+### المرحلة B: التصفح بدون إجبار على إكمال الملف
 
-## 3) مسارات الأدمن (Admin Portal)
+الطالب بعد الدخول يقدر يتصفح:
 
-> جميعها تتطلب مستخدم `user_type=admin` وحالة `active`.
+1. `GET /api/student/dashboard-stats`
+2. `GET /api/student/opportunities`
+3. `GET /api/student/opportunities/{id}`
+4. `GET /api/student/requests`
+5. `GET /api/student/timeline`
+6. `GET /api/student/complaints`
 
-| Method | Path | الاستخدام |
-|---|---|---|
-| `GET` | `/api/admin/dashboard-stats` | إحصائيات لوحة الأدمن |
-| `GET` | `/api/admin/students` | قائمة الطلاب (فلترة: `q`, `department`, `status`, `per_page`) |
-| `POST` | `/api/admin/students` | إنشاء طالب من الأدمن |
-| `PUT` | `/api/admin/students/{id}` | تحديث بيانات طالب |
-| `PATCH` | `/api/admin/students/{id}/status` | تغيير حالة طالب (`active/suspended`) |
-| `GET` | `/api/admin/institutions` | قائمة المؤسسات (فلترة: `q`, `status`, `per_page`) |
-| `POST` | `/api/admin/institutions` | إنشاء مؤسسة من الأدمن |
-| `PUT` | `/api/admin/institutions/{id}` | تحديث مؤسسة |
-| `PATCH` | `/api/admin/institutions/{id}/approve` | اعتماد مؤسسة مباشرة (`active`) |
-| `PATCH` | `/api/admin/institutions/{id}/status` | تغيير حالة مؤسسة (`active/pending_approval/suspended`) |
-| `GET` | `/api/admin/requests` | مراجعة طلبات التدريب (افتراضيًا `pending_admin/pending`) |
-| `GET` | `/api/admin/requests/{id}` | تفاصيل طلب تدريب |
-| `PATCH` | `/api/admin/requests/{id}/approve` | اعتماد أكاديمي -> يحول الطلب إلى `pending_institution` |
-| `PATCH` | `/api/admin/requests/{id}/reject` | رفض أكاديمي -> `rejected` |
-| `GET` | `/api/admin/internships` | مراقبة التدريبات (فلترة: `status`, `student_id`, `institution_id`) |
-| `GET` | `/api/admin/internships/{id}` | تفاصيل تدريب + تقارير + تقييمات |
+لا تعمل redirect إجباري لصفحة البروفايل.
 
-## 4) مسارات المؤسسة (Institution Portal)
+### المرحلة C: إدارة ملف الطالب
 
-> تتطلب `user_type=institution`. أغلب العمليات تتطلب المؤسسة فعالة `active`.
+1. `GET /api/student/profile`
+2. `PUT /api/student/profile`
+3. Body (الكل اختياري):
+```json
+{
+  "department": "Computer Science",
+  "level": "4",
+  "gpa": 3.4,
+  "city": "Sanaa",
+  "university": "اسم الجامعة نفسها",
+  "skills": ["Laravel", "SQL"]
+}
+```
 
-| Method | Path | الاستخدام |
-|---|---|---|
-| `GET` | `/api/institution/profile` | ملف المؤسسة |
-| `PUT` | `/api/institution/profile` | تحديث ملف المؤسسة |
-| `POST` | `/api/institution/profile/logo` | رفع شعار المؤسسة |
-| `GET` | `/api/institution/dashboard-stats` | إحصائيات المؤسسة |
-| `GET` | `/api/institution/opportunities` | فرص المؤسسة |
-| `POST` | `/api/institution/opportunities` | إنشاء فرصة (`status: active/closed`) |
-| `GET` | `/api/institution/opportunities/{id}` | تفاصيل فرصة |
-| `PUT` | `/api/institution/opportunities/{id}` | تحديث فرصة |
-| `PATCH` | `/api/institution/opportunities/{id}/status` | تغيير حالة فرصة (`active/closed`) |
-| `GET` | `/api/institution/requests` | طلبات المرشحين بانتظار المؤسسة (`pending_institution`) |
-| `GET` | `/api/institution/requests/{id}` | تفاصيل طلب متقدم |
-| `PATCH` | `/api/institution/requests/{id}/accept` | قبول الطلب -> `approved` + إنشاء `Internship(active)` |
-| `PATCH` | `/api/institution/requests/{id}/reject` | رفض الطلب -> `rejected` |
-| `GET` | `/api/institution/internships` | قائمة تدريبات المؤسسة |
-| `GET` | `/api/institution/internships/{id}/reports` | تقارير تدريب |
-| `POST` | `/api/institution/internships/{id}/evaluate` | تقييم متدرب (score 1..100) |
-| `GET` | `/api/institution/complaints` | شكاوى المؤسسة |
-| `POST` | `/api/institution/complaints` | إنشاء شكوى مؤسسة |
+1. `POST /api/student/profile/cv`
+2. Form-Data:
+   - `cv` (pdf فقط, max 5MB)
 
-## 5) مسارات الطالب (Student Portal)
+### المرحلة D: التقديم على فرصة
 
-> تتطلب `user_type=student` وحساب فعال.
+1. `POST /api/student/opportunities/{id}/apply`
+2. Body:
+```json
+{
+  "student_answers_block": "إجابات الطالب على أسئلة الفرصة",
+  "student_notes": "ملاحظات اختيارية"
+}
+```
+3. شروط الباك قبل إنشاء الطلب:
+   - الملف مكتمل 100%.
+   - الجامعة مطابقة لجامعة النظام.
+   - لا يوجد تدريب نشط للطالب.
+   - لا يوجد طلب معلق سابق.
+   - لا يوجد طلب سابق لنفس الفرصة بحالة نشطة.
+4. ردود مهمة:
+   - `201` تم إنشاء الطلب.
+   - `422` نقص ملف/شرط عمل/جامعة.
+   - `404` الفرصة غير متاحة.
 
-| Method | Path | الاستخدام |
-|---|---|---|
-| `GET` | `/api/student/profile` | ملف الطالب + نسبة اكتمال |
-| `PUT` | `/api/student/profile` | تحديث ملف الطالب |
-| `POST` | `/api/student/profile/cv` | رفع السيرة الذاتية PDF |
-| `GET` | `/api/student/dashboard-stats` | إحصائيات الطالب + فرص مقترحة |
-| `GET` | `/api/student/timeline` | Timeline لحالة آخر طلب |
-| `GET` | `/api/student/opportunities` | فرص متاحة للطالب (فلترة: `city`, `company`, `type`, `per_page`) |
-| `GET` | `/api/student/opportunities/{id}` | تفاصيل فرصة |
-| `POST` | `/api/student/opportunities/{id}/apply` | التقديم على فرصة |
-| `GET` | `/api/student/requests` | طلبات الطالب |
-| `GET` | `/api/student/requests/{id}` | تفاصيل طلب محدد |
-| `GET` | `/api/student/my-internship` | التدريب الحالي/الأخير الموافق عليه |
-| `POST` | `/api/student/my-internship/reports` | رفع تقرير أسبوعي |
-| `GET` | `/api/student/my-internship/evaluation` | التقييم النهائي للطالب |
-| `GET` | `/api/student/complaints` | شكاوى الطالب |
-| `POST` | `/api/student/complaints` | إنشاء شكوى طالب |
+### المرحلة E: أثناء التدريب
 
-## 6) مسارات CRUD العامة (موجودة أيضًا بالنظام)
+1. `GET /api/student/my-internship`
+2. `POST /api/student/my-internship/reports`
+3. Body:
+```json
+{
+  "title": "تقرير أسبوعي 1",
+  "description": "ما تم إنجازه...",
+  "report_date": "2026-04-17"
+}
+```
+4. `GET /api/student/my-internship/evaluation`
 
-هذه مسارات API عامة ومفيدة غالبًا للباك-أوفيس أو الدمج الداخلي:
+## 4) تدفق المؤسسة الكامل
 
-| Method | Path | الاستخدام |
-|---|---|---|
-| `GET` | `/api/students` | قائمة الطلاب |
-| `POST` | `/api/students` | إنشاء سجل طالب (يتطلب `user_id` موجود) |
-| `GET` | `/api/students/{student}` | تفاصيل طالب |
-| `PUT/PATCH` | `/api/students/{student}` | تحديث طالب |
-| `DELETE` | `/api/students/{student}` | تعطيل طالب (`is_active=false`) |
-| `GET` | `/api/institutions` | قائمة المؤسسات |
-| `POST` | `/api/institutions` | تسجيل مؤسسة (ينشئ User + Institution بحالة `pending_approval`) |
-| `GET` | `/api/institutions/{institution}` | تفاصيل مؤسسة |
-| `PUT/PATCH` | `/api/institutions/{institution}` | تحديث مؤسسة |
-| `DELETE` | `/api/institutions/{institution}` | تعطيل مؤسسة |
-| `POST` | `/api/opportunities` | إنشاء فرصة (عام) |
-| `PUT/PATCH` | `/api/opportunities/{opportunity}` | تحديث فرصة (عام) |
-| `DELETE` | `/api/opportunities/{opportunity}` | تعطيل فرصة |
-| `GET` | `/api/training-requests` | قائمة طلبات التدريب |
-| `POST` | `/api/training-requests` | إنشاء طلب تدريب (عام) |
-| `PUT` | `/api/training-requests/{id}/status` | تغيير حالة طلب |
-| `GET` | `/api/internships` | قائمة التدريبات |
-| `GET` | `/api/reports` | قائمة التقارير |
-| `POST` | `/api/reports` | إنشاء تقرير |
-| `GET` | `/api/evaluations` | قائمة التقييمات |
-| `POST` | `/api/evaluations` | إنشاء تقييم |
+### المرحلة A: الدخول والتحقق من التفعيل
 
-## 7) دورة العمل الكاملة (Workflow)
+1. `POST /api/login` بحساب مؤسسة.
+2. إذا المؤسسة غير مفعلة (`status != active`) كثير من العمليات ترجع `403`.
 
-## 7.1 مسار الطالب
+### المرحلة B: إدارة ملف المؤسسة
 
-1. يسجل حساب: `POST /api/register`
-2. يسجل دخول: `POST /api/login`
-3. يكمل ملفه ويرفع CV:
-- `PUT /api/student/profile`
-- `POST /api/student/profile/cv`
-4. يستعرض الفرص:
-- `GET /api/student/opportunities`
-- `GET /api/student/opportunities/{id}`
-5. يقدم على فرصة:
-- `POST /api/student/opportunities/{id}/apply`
-- الحالة الابتدائية للطلب: `pending_admin`
-6. يتابع الحالة:
-- `GET /api/student/requests`
-- `GET /api/student/timeline`
-7. بعد القبول النهائي يبدأ التدريب:
-- `GET /api/student/my-internship`
-- `POST /api/student/my-internship/reports`
-- `GET /api/student/my-internship/evaluation`
+1. `GET /api/institution/profile`
+2. `PUT /api/institution/profile`
+3. Body (اختياري):
+```json
+{
+  "name": "اسم المؤسسة",
+  "description": "وصف",
+  "website": "https://example.com",
+  "contact_person": "الاسم",
+  "contact_phone": "+967700000000",
+  "address": "Sanaa, Yemen",
+  "social_links": ["https://linkedin.com/company/example"]
+}
+```
+4. `POST /api/institution/profile/logo`
+5. Form-Data:
+   - `logo` (jpg/jpeg/png/webp, max 2MB)
 
-## 7.2 مسار الأدمن
+### المرحلة C: إضافة فرصة تدريبية (تفصيلي)
 
-1. مراجعة الطلبات الأكاديمية:
-- `GET /api/admin/requests`
-- `GET /api/admin/requests/{id}`
-2. القرار:
-- قبول أكاديمي: `PATCH /api/admin/requests/{id}/approve` -> `pending_institution`
-- رفض أكاديمي: `PATCH /api/admin/requests/{id}/reject` -> `rejected`
-3. إدارة الكيانات:
-- الطلاب: `/api/admin/students...`
-- المؤسسات: `/api/admin/institutions...`
-4. متابعة التدريبات:
-- `GET /api/admin/internships`
-- `GET /api/admin/internships/{id}`
+1. `POST /api/institution/opportunities`
+2. Body:
+```json
+{
+  "title": "Backend Intern",
+  "department": "Computer Science",
+  "description": "تفاصيل الفرصة",
+  "required_skills": "PHP, Laravel, MySQL",
+  "start_date": "2026-06-01",
+  "end_date": "2026-08-31",
+  "application_deadline": "2026-05-20",
+  "available_seats": 5,
+  "city": "Sanaa",
+  "training_type": "summer",
+  "custom_questions": ["لماذا تريد هذه الفرصة؟"],
+  "status": "active"
+}
+```
+3. حقول مطلوبة: `title`, `start_date`, `end_date`, `available_seats`.
+4. قيود:
+   - `end_date >= start_date`
+   - `application_deadline <= start_date` إذا أرسلت
+   - `training_type` قيمته: `summer` أو `cooperative`
+   - `status` قيمته: `active` أو `closed`
+5. الباك يضيف تلقائيًا:
+   - `institution_id` من المؤسسة المسجلة.
+   - `is_active` حسب `status`.
 
-## 7.3 مسار المؤسسة
+### المرحلة D: تعديل وإغلاق الفرصة
 
-1. إدارة الحساب والملف:
-- `GET/PUT /api/institution/profile`
-- `POST /api/institution/profile/logo`
-2. إدارة الفرص:
-- `GET/POST /api/institution/opportunities`
-- `PUT/PATCH /api/institution/opportunities/{id}...`
-3. مراجعة طلبات الترشيح الواردة من الجامعة:
-- `GET /api/institution/requests`
-- `GET /api/institution/requests/{id}`
-4. القرار النهائي:
-- قبول: `PATCH /api/institution/requests/{id}/accept` -> `approved` + إنشاء Internship
-- رفض: `PATCH /api/institution/requests/{id}/reject` -> `rejected`
-5. أثناء التدريب:
-- `GET /api/institution/internships`
-- `GET /api/institution/internships/{id}/reports`
-- `POST /api/institution/internships/{id}/evaluate`
+1. `PUT /api/institution/opportunities/{id}` (نفس حقول الإضافة لكن كلها اختيارية)
+2. `PATCH /api/institution/opportunities/{id}/status`
+3. Body:
+```json
+{
+  "status": "closed"
+}
+```
 
-## 8) حالات النظام المهمة للفرونت
+### المرحلة E: مراجعة الطلبات
 
-### حالات طلب التدريب `training_requests.status`
+1. `GET /api/institution/requests`
+2. `GET /api/institution/requests/{id}`
+3. قبول:
+   - `PATCH /api/institution/requests/{id}/accept`
+   - شرط: الحالة الحالية `pending_institution`.
+   - النتيجة: `approved` وإنشاء/تفعيل internship.
+4. رفض:
+   - `PATCH /api/institution/requests/{id}/reject`
+   - Body:
+```json
+{
+  "institution_notes": "سبب الرفض"
+}
+```
 
-- `pending_admin`: بانتظار موافقة الجامعة
-- `pending_institution`: بانتظار رد المؤسسة
-- `approved`: مقبول نهائيًا
-- `rejected`: مرفوض
-- `completed`: منتهي
-- تظهر أيضًا في الـ validation العامة: `pending`, `under_review`
+### المرحلة F: إدارة التدريب والتقييم
 
-### حالات حساب المؤسسة `users.status`
+1. `GET /api/institution/internships`
+2. `GET /api/institution/internships/{id}/reports`
+3. `POST /api/institution/internships/{id}/evaluate`
+4. Body:
+```json
+{
+  "score": 85,
+  "notes": "أداء ممتاز"
+}
+```
+5. قيود: `score` من 1 إلى 100.
 
+## 5) تدفق الأدمن الكامل
+
+### المرحلة A: المتابعة العامة
+
+1. `POST /api/login` بحساب أدمن.
+2. `GET /api/admin/dashboard-stats`
+
+### المرحلة B: إدارة الطلاب
+
+1. `GET /api/admin/students`
+2. `POST /api/admin/students`
+3. Body:
+```json
+{
+  "full_name": "اسم الطالب",
+  "email": "student2@example.com",
+  "password": "password123",
+  "password_confirmation": "password123",
+  "phone": "+967700000001",
+  "student_number": "STU-2026-1002",
+  "department": "IT",
+  "level": "3",
+  "gpa": 3.1,
+  "status": "active"
+}
+```
+4. `PUT /api/admin/students/{id}` (حقول تحديث مرنة).
+5. `PATCH /api/admin/students/{id}/status`
+6. Body:
+```json
+{
+  "status": "suspended"
+}
+```
+
+### المرحلة C: إدارة المؤسسات
+
+1. `GET /api/admin/institutions`
+2. `POST /api/admin/institutions`
+3. Body:
+```json
+{
+  "full_name": "مسؤول المؤسسة",
+  "email": "inst@example.com",
+  "password": "password123",
+  "password_confirmation": "password123",
+  "phone": "+967700000002",
+  "name": "شركة مثال",
+  "address": "Aden, Yemen",
+  "description": "وصف المؤسسة",
+  "website": "https://example.org",
+  "contact_person": "مسؤول الموارد البشرية",
+  "contact_phone": "+967700000003",
+  "status": "pending_approval"
+}
+```
+4. `PUT /api/admin/institutions/{id}`
+5. `PATCH /api/admin/institutions/{id}/approve`
+6. `PATCH /api/admin/institutions/{id}/status`
+
+### المرحلة D: دورة اعتماد طلبات التدريب
+
+1. `GET /api/admin/requests`
+2. `GET /api/admin/requests/{id}`
+3. موافقة أكاديمية:
+   - `PATCH /api/admin/requests/{id}/approve`
+   - Body:
+```json
+{
+  "admin_notes": "موافق"
+}
+```
+   - النتيجة: الطلب يتحول إلى `pending_institution`.
+4. رفض أكاديمي:
+   - `PATCH /api/admin/requests/{id}/reject`
+   - Body:
+```json
+{
+  "admin_notes": "سبب الرفض (مطلوب)"
+}
+```
+
+### المرحلة E: متابعة التدريب
+
+1. `GET /api/admin/internships`
+2. `GET /api/admin/internships/{id}`
+
+## 6) الحالات المهمة للفرونت
+
+### training request status
+- `pending_admin`
+- `pending_institution`
+- `approved`
+- `rejected`
+- `completed`
+
+### institution user status
 - `pending_approval`
 - `active`
 - `suspended`
 
-### حالات حساب الطالب (من إدارة الأدمن)
-
-- `active`
-- `suspended`
-
-### حالات الفرصة `training_opportunities.status`
-
+### opportunity status
 - `active`
 - `closed`
 
-## 9) أهم حقول الإدخال السريعة
+## 7) قواعد UI/UX مطلوبة
 
-### Auth
-
-- `POST /api/register`: `full_name, email, password, password_confirmation, user_type=student`
-- `POST /api/login`: `email, password`
-- `POST /api/change-password`: `current_password, new_password, new_password_confirmation`
-
-### Student Apply
-
-- `POST /api/student/opportunities/{id}/apply`
-- `student_answers_block` (required)
-- `student_notes` (optional)
-
-### Admin Request Decision
-
-- `PATCH /api/admin/requests/{id}/approve`
-- `admin_notes` (optional)
-- `PATCH /api/admin/requests/{id}/reject`
-- `admin_notes` (required)
-
-### Institution Decision
-
-- `PATCH /api/institution/requests/{id}/accept`
-- body اختياري
-- `PATCH /api/institution/requests/{id}/reject`
-- `institution_notes` (optional)
-
-### رفع ملفات
-
-- `POST /api/student/profile/cv`: حقل `cv` (PDF, max 5MB)
-- `POST /api/institution/profile/logo`: حقل `logo` (image, max 2MB)
-- `POST /api/documents/upload`: حقل `file` (pdf/jpg/jpeg/png, max 10MB) + `title?` + `request_id?`
-
+1. لا تعمل redirect إجباري لإكمال ملف الطالب بعد الدخول.
+2. اسمح بالتصفح الكامل.
+3. امنع التنفيذ فقط عند العمليات المقيدة (خصوصا التقديم).
+4. عند فشل التقديم بـ `422` بسبب نقص بيانات، اعرض الحقول الناقصة للمستخدم مباشرة.
+5. عند فشل الجامعة، اعرض رسالة صريحة: الحساب ليس ضمن جامعة النظام.

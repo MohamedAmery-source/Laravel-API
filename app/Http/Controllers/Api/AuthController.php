@@ -30,6 +30,7 @@ class AuthController extends Controller
             Student::create([
                 'user_id' => $user->user_id,
                 'student_number' => $request->student_number ?? 'STU-'.random_int(1000, 9999),
+                'university' => $request->university,
                 'department' => $request->department ?? 'General',
                 'level' => $request->level ?? 'Level 1',
             ]);
@@ -50,6 +51,8 @@ class AuthController extends Controller
         $request->authenticate();
 
         $user = $request->user();
+
+
         $token = $user->createToken('auth_token')->plainTextToken;
         $user->load(['student', 'institution']);
 

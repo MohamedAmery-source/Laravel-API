@@ -36,7 +36,7 @@ class LoginRequest extends ApiFormRequest
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'email' => 'بيانات الدخول غير صحيحة.',
+                'email' => 'Invalid login credentials.',
             ]);
         }
 
@@ -57,7 +57,7 @@ class LoginRequest extends ApiFormRequest
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
         throw ValidationException::withMessages([
-            'email' => 'محاولات تسجيل دخول كثيرة. يرجى المحاولة بعد '.$seconds.' ثانية.',
+            'email' => 'Too many login attempts. Try again after '.$seconds.' seconds.',
         ]);
     }
 
@@ -66,6 +66,3 @@ class LoginRequest extends ApiFormRequest
         return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
     }
 }
-
-
-

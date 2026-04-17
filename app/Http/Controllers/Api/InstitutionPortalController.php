@@ -18,7 +18,7 @@ use Illuminate\Validation\Rule;
 
 class InstitutionPortalController extends Controller
 {
-    private const ACCOUNT_BLOCKED_MESSAGE = 'حسابك قيد المراجعة من قبل إدارة الجامعة، يرجى الانتظار لحين التفعيل.';
+    private const ACCOUNT_BLOCKED_MESSAGE = 'Your account is pending university review. Please wait until activation.';
 
     public function profile(Request $request): JsonResponse
     {
@@ -51,7 +51,7 @@ class InstitutionPortalController extends Controller
         $institution->update($data);
         $institution->refresh()->load('user');
 
-        return $this->success($this->profilePayload($institution), 'تم تحديث ملف المؤسسة بنجاح.');
+        return $this->success($this->profilePayload($institution), 'Institution profile updated successfully.');
     }
 
     public function uploadLogo(Request $request): JsonResponse
@@ -73,7 +73,7 @@ class InstitutionPortalController extends Controller
         return $this->success([
             'logo_path' => $path,
             'logo_url' => Storage::disk('public')->url($path),
-        ], 'تم رفع شعار المؤسسة بنجاح.');
+        ], 'Institution logo uploaded successfully.');
     }
 
     public function dashboardStats(Request $request): JsonResponse
@@ -180,7 +180,7 @@ class InstitutionPortalController extends Controller
 
         $opportunity = TrainingOpportunity::query()->create($data);
 
-        return $this->success($opportunity, 'تم إنشاء الفرصة التدريبية بنجاح.', 201);
+        return $this->success($opportunity, 'Training opportunity created successfully.', 201);
     }
 
     public function showOpportunity(Request $request, string $id): JsonResponse
@@ -195,7 +195,7 @@ class InstitutionPortalController extends Controller
             ->find($id);
 
         if (!$opportunity) {
-            return $this->error('الفرصة التدريبية غير موجودة أو لا تملك صلاحية الوصول إليها.', 404);
+            return $this->error('Training opportunity not found or access denied.', 404);
         }
 
         return $this->success($opportunity);
@@ -213,7 +213,7 @@ class InstitutionPortalController extends Controller
             ->find($id);
 
         if (!$opportunity) {
-            return $this->error('الفرصة التدريبية غير موجودة أو لا تملك صلاحية تعديلها.', 404);
+            return $this->error('Training opportunity not found or update access denied.', 404);
         }
 
         $data = $request->validate([
@@ -238,7 +238,7 @@ class InstitutionPortalController extends Controller
 
         $opportunity->update($data);
 
-        return $this->success($opportunity->fresh(), 'تم تحديث بيانات الفرصة التدريبية بنجاح.');
+        return $this->success($opportunity->fresh(), 'Training opportunity updated successfully.');
     }
 
     public function changeOpportunityStatus(Request $request, string $id): JsonResponse
@@ -257,7 +257,7 @@ class InstitutionPortalController extends Controller
             ->find($id);
 
         if (!$opportunity) {
-            return $this->error('الفرصة التدريبية غير موجودة أو لا تملك صلاحية تعديلها.', 404);
+            return $this->error('Training opportunity not found or update access denied.', 404);
         }
 
         $opportunity->update([
@@ -268,7 +268,7 @@ class InstitutionPortalController extends Controller
         return $this->success([
             'opportunity_id' => $opportunity->opportunity_id,
             'status' => $opportunity->status,
-        ], 'تم تحديث حالة الفرصة التدريبية بنجاح.');
+        ], 'Training opportunity status updated successfully.');
     }
 
     public function listRequests(Request $request): JsonResponse
@@ -324,7 +324,7 @@ class InstitutionPortalController extends Controller
             ->find($id);
 
         if (!$trainingRequest) {
-            return $this->error('طلب التقديم غير موجود أو لا تملك صلاحية الوصول إليه.', 404);
+            return $this->error('Training request not found or access denied.', 404);
         }
 
         $cv = $trainingRequest->documents
@@ -340,7 +340,7 @@ class InstitutionPortalController extends Controller
                 'full_name' => $trainingRequest->student?->user?->full_name,
                 'email' => $trainingRequest->student?->user?->email,
                 'phone' => $trainingRequest->student?->user?->phone,
-                'university' => 'جامعة القصيم',
+                'university' => $trainingRequest->student?->university,
                 'gpa' => $trainingRequest->student?->gpa,
                 'department' => $trainingRequest->student?->department,
                 'level' => $trainingRequest->student?->level,
@@ -372,11 +372,11 @@ class InstitutionPortalController extends Controller
             ->find($id);
 
         if (!$trainingRequest) {
-            return $this->error('طلب التقديم غير موجود أو لا تملك صلاحية الوصول إليه.', 404);
+            return $this->error('Training request not found or access denied.', 404);
         }
 
         if ($trainingRequest->status !== 'pending_institution') {
-            return $this->error('لا يمكن قبول هذا الطلب لأن حالته الحالية لا تسمح بذلك.', 422);
+            return $this->error('This request cannot be accepted in its current status.', 422);
         }
 
         DB::transaction(function () use ($trainingRequest) {
@@ -397,7 +397,7 @@ class InstitutionPortalController extends Controller
         return $this->success([
             'request_id' => $trainingRequest->request_id,
             'status' => 'approved',
-        ], 'تم قبول الطالب وتحويله إلى متدرب نشط.');
+        ], 'Student accepted and moved to active internship.');
     }
 
     public function rejectRequest(Request $request, string $id): JsonResponse
@@ -418,11 +418,11 @@ class InstitutionPortalController extends Controller
             ->find($id);
 
         if (!$trainingRequest) {
-            return $this->error('طلب التقديم غير موجود أو لا تملك صلاحية الوصول إليه.', 404);
+            return $this->error('Training request not found or access denied.', 404);
         }
 
         if (!in_array($trainingRequest->status, ['pending_institution', 'pending_admin', 'pending'], true)) {
-            return $this->error('لا يمكن رفض هذا الطلب لأن حالته الحالية لا تسمح بذلك.', 422);
+            return $this->error('This request cannot be rejected in its current status.', 422);
         }
 
         $trainingRequest->update([
@@ -433,7 +433,7 @@ class InstitutionPortalController extends Controller
         return $this->success([
             'request_id' => $trainingRequest->request_id,
             'status' => 'rejected',
-        ], 'تم رفض الطلب بنجاح.');
+        ], 'Training request rejected successfully.');
     }
 
     public function listInternships(Request $request): JsonResponse
@@ -515,7 +515,7 @@ class InstitutionPortalController extends Controller
             ]
         );
 
-        return $this->success($evaluation, 'تم حفظ التقييم وإرساله للجامعة بنجاح.');
+        return $this->success($evaluation, 'Evaluation saved and submitted successfully.');
     }
 
     public function listComplaints(Request $request): JsonResponse
@@ -555,14 +555,14 @@ class InstitutionPortalController extends Controller
             'status' => 'pending',
         ]);
 
-        return $this->success($complaint, 'تم إرسال الشكوى بنجاح.', 201);
+        return $this->success($complaint, 'Complaint submitted successfully.', 201);
     }
 
     public function studentStoreRequest(Request $request): JsonResponse
     {
         $user = $request->user();
         if (!$user || $user->user_type !== 'student' || !$user->student) {
-            return $this->error('هذه الواجهة مخصصة للطلاب فقط.', 403);
+            return $this->error('This endpoint is for students only.', 403);
         }
 
         $data = $request->validate([
@@ -578,7 +578,7 @@ class InstitutionPortalController extends Controller
             ->exists();
 
         if ($exists) {
-            return $this->error('لديك طلب سابق لنفس الفرصة ولا يمكن التقديم مرة أخرى حالياً.', 422);
+            return $this->error('A previous request for this opportunity already exists.', 422);
         }
 
         $trainingRequest = TrainingRequest::query()->create([
@@ -591,7 +591,7 @@ class InstitutionPortalController extends Controller
             'is_active' => true,
         ]);
 
-        return $this->success($trainingRequest, 'تم تقديم طلب التدريب بنجاح.', 201);
+        return $this->success($trainingRequest, 'Training request submitted successfully.', 201);
     }
 
     private function institutionFromRequest(Request $request, bool $requireActive): Institution|JsonResponse
@@ -599,16 +599,16 @@ class InstitutionPortalController extends Controller
         $user = $request->user();
 
         if (!$user) {
-            return $this->error('غير مصرح. يرجى تسجيل الدخول.', 401);
+            return $this->error('Unauthorized. Please login first.', 401);
         }
 
         if ($user->user_type !== 'institution') {
-            return $this->error('هذه الواجهة مخصصة للجهات التدريبية فقط.', 403);
+            return $this->error('This endpoint is for institutions only.', 403);
         }
 
         $institution = $user->institution()->with('user')->first();
         if (!$institution) {
-            return $this->error('لم يتم العثور على ملف المؤسسة المرتبط بهذا الحساب.', 404);
+            return $this->error('No institution profile found for this account.', 404);
         }
 
         if ($requireActive && (!$user->is_active || $user->status !== 'active')) {
@@ -636,7 +636,7 @@ class InstitutionPortalController extends Controller
             ->first();
 
         if (!$internship) {
-            return $this->error('سجل التدريب غير موجود أو لا تملك صلاحية الوصول إليه.', 404);
+            return $this->error('Internship record not found or access denied.', 404);
         }
 
         return $internship;
@@ -681,3 +681,4 @@ class InstitutionPortalController extends Controller
         ];
     }
 }
+

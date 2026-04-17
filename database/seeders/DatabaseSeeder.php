@@ -67,11 +67,11 @@ class DatabaseSeeder extends Seeder
         $institution = Institution::create([
             'user_id' => $institutionUser->user_id,
             'name' => 'Future Tech Inc',
-            'address' => 'Riyadh, King Fahd Rd',
+            'address' => 'Sana\'a, Zubairi Street',
             'description' => 'A technology company specializing in software platforms.',
             'website' => 'https://futuretech.local',
             'contact_person' => 'Sara Ali',
-            'contact_phone' => '0501234567',
+            'contact_phone' => '+967712345678',
             'is_active' => true,
         ]);
 
@@ -228,28 +228,28 @@ class DatabaseSeeder extends Seeder
             'is_active' => true,
         ]);
 
-        $riyadh = LookupValue::create([
+        $sanaa = LookupValue::create([
             'lookup_id' => $lookupCities->lookup_id,
-            'value_code' => 'riyadh',
-            'description' => 'Riyadh',
-            'value_data' => 'Riyadh',
+            'value_code' => 'sanaa',
+            'description' => 'Sana\'a',
+            'value_data' => 'Sana\'a',
             'is_active' => true,
         ]);
 
         LookupValue::create([
             'lookup_id' => $lookupCities->lookup_id,
-            'value_code' => 'jeddah',
-            'description' => 'Jeddah',
-            'value_data' => 'Jeddah',
+            'value_code' => 'aden',
+            'description' => 'Aden',
+            'value_data' => 'Aden',
             'is_active' => true,
         ]);
 
         GeneralSetting::create([
             'site_name' => 'Education Training Portal',
             'site_logo' => 'logos/main.png',
-            'system_status' => $riyadh->value_id,
+            'system_status' => $sanaa->value_id,
             'content_email' => 'support@education.local',
-            'content_phone' => '0110000000',
+            'content_phone' => '+967100000000',
             'privacy_policy' => 'Default privacy policy',
             'is_active' => true,
         ]);

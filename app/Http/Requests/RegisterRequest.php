@@ -19,6 +19,7 @@ class RegisterRequest extends ApiFormRequest
             'password' => 'required|string|confirmed|min:8',
             // Institution accounts are created by admin through InstitutionController@store
             'user_type' => 'required|in:student',
+            'university' => 'nullable|string|max:150',
             'student_number' => 'nullable|string|max:20',
             'department' => 'nullable|string|max:100',
             'level' => 'nullable|string|max:10',
